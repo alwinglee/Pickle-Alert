@@ -2,18 +2,19 @@ import requests
 from dotenv import load_dotenv
 import os
 
-FORECAST_DAYS = 3 #Number of days to forecast
-load_dotenv()
+# Number of days to forecast
+FORECAST_DAYS = 3
 
-parameters={
-    "q": f"{os.getenv("LAT")},{os.getenv("LON")}",
-    "key": os.getenv("API_KEY"),
-    "days": FORECAST_DAYS
-}
+# TODO: Create Try Except
+def retrieveAPIResponse():
+    weatherResponse = requests.get(os.getenv("URL"), params= {"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
+                                                              "key": os.getenv("API_KEY"), "days": FORECAST_DAYS})
+    return weatherResponse.json()
+def main():
+    load_dotenv()
+    weatherData = retrieveAPIResponse()
 
-# TODO: Implement main() and response() functions
-weatherResponse = requests.get(os.getenv("URL"), params=parameters)
-weatherData = weatherResponse.json()
+main()
 
 
 
