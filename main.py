@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 from location import Location
 from daylight import Daylight
+from rain import Rain
 
 # Number of days to forecast
 FORECAST_DAYS = 3
@@ -19,7 +20,7 @@ def fetchWeatherForecast():
                                                               "key": os.getenv("API_KEY"), "days": FORECAST_DAYS})
     return weatherResponse.json()
 
-def formatReport(locationDetails,daylightDetails):
+def formatReport(locationDetails,daylightDetails,rainDetails):
     """
     Takes the string representation of each class and formats it into a customized report.
 
@@ -29,7 +30,11 @@ def formatReport(locationDetails,daylightDetails):
     :return: None
     """
     print(f"{locationDetails}\n"
-          f"{daylightDetails}")
+          f"{daylightDetails}\n"
+          f"\n- - - SUMMARY - - -\n"
+          f"{rainDetails.rainSummary()}\n"
+          f"{rainDetails}"
+          )
 
 def main():
     """
@@ -41,12 +46,10 @@ def main():
     weatherData = fetchWeatherForecast()
     locationDetails = Location(weatherData)
     daylightDetails = Daylight(weatherData)
-    formatReport(locationDetails,daylightDetails)
+    rainDetails = Rain(weatherData)
+    formatReport(locationDetails,daylightDetails,rainDetails)
 
 main()
-
-
-
 
 
 
