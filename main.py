@@ -1,26 +1,15 @@
-import requests
 from dotenv import load_dotenv
-import os
+from weatherapi import WeatherAPI
 from location import Location
 from daylight import Daylight
 from rain import Rain
+from wind import Wind
 
 # Number of days to forecast
 FORECAST_DAYS = 3
 
-# TODO: Create Try Except
-def fetchWeatherForecast():
-    """
-    Sends a request to the API server with specific parameters to retrieve the weather forecast for the current day
-    and the next two days.
-
-    :return: The API's weather forecast response in JSON format.
-    """
-    weatherResponse = requests.get(os.getenv("URL"), params= {"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
-                                                              "key": os.getenv("API_KEY"), "days": FORECAST_DAYS})
-    return weatherResponse.json()
-
-def formatReport(locationDetails,daylightDetails,rainDetails):
+# TODO: Update DocString
+def formatReport(locationDetails,daylightDetails,rainDetails,windDetails):
     """
     Takes the string representation of each class and formats it into a customized report.
 
@@ -32,9 +21,15 @@ def formatReport(locationDetails,daylightDetails,rainDetails):
     print(f"{locationDetails}\n"
           f"{daylightDetails}\n"
           f"\n- - - SUMMARY - - -\n"
-          f"{rainDetails.rainSummary()}\n"
-          f"{rainDetails}"
-          )
+          f"RAIN:\n"
+          f"- {rainDetails.rainSummary()}\n"
+          f"WIND SPEED:\n"
+          f"- {windDetails.windSpeedSummary()}\n"
+          f"WIND GUST:\n"
+          f"{windDetails}")
+
+
+
 
 def main():
     """
@@ -42,12 +37,12 @@ def main():
 
     :return: None
     """
-    load_dotenv()
-    weatherData = fetchWeatherForecast()
+    weatherData = WeatherAPI.fetchWeatherForecast(FORECAST_DAYS)
     locationDetails = Location(weatherData)
     daylightDetails = Daylight(weatherData)
     rainDetails = Rain(weatherData)
-    formatReport(locationDetails,daylightDetails,rainDetails)
+    windDetails = Wind(weatherData)
+    formatReport(locationDetails,daylightDetails,rainDetails,windDetails)
 
 main()
 
