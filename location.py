@@ -3,19 +3,19 @@ class Location:
     """
     Represents the geographical location (city, region, country) and local time for specific coordinates.
     """
-    def __init__(self,weatherData):
+    def __init__(self,weather_data):
         """
         Initializes Location with geographic details and local time extracted from weather API response.
 
-        :param weatherData: Weather forecast response in JSON format.
+        :param weather_data: Weather forecast response in JSON format.
 
         :return: None
         """
-        self.weatherData=weatherData
-        self.city = self.weatherData["location"]["name"]
-        self.region = self.weatherData["location"]["region"]
-        self.country=self.weatherData["location"]["country"]
-        self.currentDate = self.weatherData["location"]["localtime"]
+        self.weather_data=weather_data
+        self.city = self.weather_data["location"]["name"]
+        self.region = self.weather_data["location"]["region"]
+        self.country=self.weather_data["location"]["country"]
+        self.current_data = self.weather_data["location"]["localtime"]
 
     def __str__(self):
         """
@@ -25,6 +25,6 @@ class Location:
         and local time on a new line.
         """
         return (f"{self.city}, {self.region}, {self.country}\n"
-                f"{self.currentDate}")
+                f"{self.current_data}")
 
 
