@@ -7,7 +7,7 @@ class WeatherAPI:
     A class to interact with a weather API and fetch forecast data.
     """
     # TODO: Create Try Except
-    def fetchWeatherForecast(FORECAST_DAYS):
+    def fetch_weather_forecast(FORECAST_DAYS):
         """
         Sends a request to the API server with specific parameters to retrieve the weather forecast for the current day
         and the next two days.
@@ -17,6 +17,6 @@ class WeatherAPI:
         :return: The API's weather forecast response in JSON format.
         """
         load_dotenv()
-        weatherResponse = requests.get(os.getenv("URL"), params={"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
+        weather_response = requests.get(os.getenv("URL"), params={"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
                                                                  "key": os.getenv("API_KEY"), "days": FORECAST_DAYS})
-        return weatherResponse.json()
+        return weather_response.json()
