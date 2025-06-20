@@ -2,20 +2,20 @@ class Report:
     """"
     A class that formats custom string builders from all classes and generates a structured report.
     """
-    def get_am_or_pm(time_range_hour):
+    def get_am_or_pm(hour):
         """
         Assigns an 'AM' or 'PM' suffix to the given time passed into the function
 
-        :param time_range_hour: An integer representing either the start or end hour of the time range.
+        :param hour: An integer representing either the start or end hour of the time range.
 
         :return:  the time including the appropriate 'AM' or 'PM' designation.
         """
-        if (time_range_hour <12):
-            return f"{time_range_hour} AM"
+        if (hour <12):
+            return f"{hour} AM"
         else:
-            return f"{time_range_hour} PM"
+            return f"{hour} PM"
 
-    def format_report(location_details, daylight_details, rain_details, wind_details,START_TIME, END_TIME):
+    def format_report(location_details, daylight_details, rain_details, wind_details, START_TIME, END_TIME):
         """
         Takes the string representation of each class and formats it into a customized report.
 
@@ -37,9 +37,9 @@ class Report:
               f"\n- - - SUMMARY - - -\n"
               f"ANALYSIS PERIOD: {Report.get_am_or_pm(START_TIME)} - {Report.get_am_or_pm(END_TIME)}\n"
               f"RAIN:\n"
-              f"- {rain_details.rainSummary()}\n"
+              f"- {rain_details.rain_summary()}\n"
               f"WIND SPEED:\n"
-              f"- {wind_details.windSpeedSummary()}\n"
+              f"- {wind_details.wind_speed_summary()}\n"
               f"WIND GUST:\n"
-              f"- {wind_details.windGustSummary()}\n"
+              f"- {wind_details.wind_gust_summary()}\n"
               f"{wind_details}")
