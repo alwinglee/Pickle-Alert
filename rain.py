@@ -18,10 +18,6 @@ class Rain:
         self.START_TIME=START_TIME
         self.END_TIME=END_TIME+1
         self.TOP_TIMELINE_TIME=TOP_TIMELINE_TIME
-        self.will_it_rain = self.weather_data["forecast"]["forecastday"][0]["day"]["daily_will_it_rain"]
-        self.chance_of_rain = self.weather_data["forecast"]["forecastday"][0]["day"]["daily_chance_of_rain"]
-        self.total_precipitation = self.weather_data["forecast"]["forecastday"][0]["day"]["totalprecip_mm"]
-        self.rain_description = self.weather_data["forecast"]["forecastday"][0]["day"]["condition"]["text"]
         self.RAIN_CHANCE_LOW_THRESH=30
         self.RAIN_CHANCE_HIGH_THRESH = 50
         self.RAIN_PRECIPITATION_LOW_THRESH=2.5
