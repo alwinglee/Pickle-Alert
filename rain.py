@@ -128,15 +128,15 @@ class Rain:
         Generates hourly rain forecast data formatted as a chronological timeline.
 
         Each entry includes:
-            - Time (HH:MM format)
-            - Chance of rain (percentage) or Expected precipitation amount (mm)
+            - Time (in `HH:MM` format)
+            - Chance of rain (%) or expected precipitation amount (mm)
 
-        return: None
+        :return: None
         """
         timeline=self.filter_rain_metric()
-        self.string_builder.write(f"- - - RAIN {metric} REPORT - - -\n"
-                                  f"Top {self.TOP_TIMELINE_TIME} Peak Rain {metric} Hours")
-        sort_by_max = sorted(timeline,key=lambda item:item[f"{metric}"],reverse=True)
+        self.string_builder.write(f"- - - RAIN {metric.upper()} REPORT - - -\n"
+                                  f"Top {self.TOP_TIMELINE_TIME} Peak Rain {metric.title()} Hours:\n")
+        sort_by_max = sorted(timeline,key=lambda item:item[f"{metric}"],reverse=True)[:self.TOP_TIMELINE_TIME]
         sort_by_time=sorted(sort_by_max,key=lambda item:item["time"])
         for each_hour in sort_by_time:
             self.string_builder.write(f"\t {each_hour["time"]}: {each_hour[f"{metric}"]} {units}")
