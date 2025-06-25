@@ -63,9 +63,9 @@ class Wind:
 
     def wind_summary(self):
         """
-        Generates a summary of the wind speed condition for the day, including impact assessments.
+        Generates a summary of daily wind conditions, including impact assessments.
 
-        :return: String containing the day's wind speed status, including impact level description when applicable
+        :return: String containing the day's wind conditions and impact level description (when applicable).
         """
         time_period_forecast=self.filter_wind_metrics()
         max_wind_speed= self.find_max_wind_metric(time_period_forecast,"speed")
