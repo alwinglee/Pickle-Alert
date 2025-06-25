@@ -35,11 +35,12 @@ class Report:
         print(f"{location_details}\n"
               f"{daylight_details}\n"
               f"\n- - - SUMMARY - - -\n"
-              f"ANALYSIS PERIOD: {Report.get_am_or_pm(START_TIME)} - {Report.get_am_or_pm(END_TIME)}\n"
-              f"RAIN:\n"
-              f"- {rain_details.rain_summary()}\n"
-              f"WIND SPEED:\n"
-              f"- {wind_details.wind_speed_summary()}\n"
-              f"WIND GUST:\n"
-              f"- {wind_details.wind_gust_summary()}\n"
+              f"ANALYSIS PERIOD:\n"
+              f"{Report.get_am_or_pm(START_TIME)} - {Report.get_am_or_pm(END_TIME)}\n"
+              f"\nRAIN:\n"
+              f"{rain_details.rain_summary()}\n"
+              # WIND
+              f"{wind_details.wind_summary()}"
+              # Detail Rain & Wind Reports
+              f"{rain_details}"
               f"{wind_details}")
