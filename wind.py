@@ -46,11 +46,13 @@ class Wind:
 
         :return: Integer value of the highest recorded value for the specified metric in the forecast data.
         """
-        max_wind= 0
-        for each_hour in time_period_forecast:
-            if (each_hour[f"{metric}"]>max_wind):
-                max_wind=each_hour[f"{metric}"]
+        max_wind=max(each_hour[f"{metric}"] for each_hour in time_period_forecast)
         return max_wind
+
+    def calculate_average_wind(self,time_period_forecast,metric):
+        total_sum = sum(each_hour[f"{metric}"] for each_hour in time_period_forecast)
+        return round(total_sum/len(time_period_forecast))
+
 
     def wind_summary(self):
         """
@@ -61,49 +63,53 @@ class Wind:
         time_period_forecast=self.filter_wind_metrics()
         max_wind_speed= self.find_max_wind(time_period_forecast,"speed")
         max_wind_gust=self.find_max_wind(time_period_forecast,"gust")
+        average_wind_speed = self.calculate_average_wind(time_period_forecast, "speed")
+        average_wind_gust = self.calculate_average_wind(time_period_forecast, "gust")
         return ("WIND SPEED:\n"
-                f"Playability: {self.wind_speed_impact(max_wind_speed)}\n"
+                f"max.{max_wind_speed}kph | avg.{average_wind_speed}kph\n"
+                f"Playability: {self.wind_speed_impact(max_wind_speed, average_wind_speed)}\n"
                 f"\nWIND GUST:\n"
-                f"{self.wind_gust_impact(max_wind_gust)}\n")
+                f"max.{max_wind_gust}kph | avg.{average_wind_gust}kph\n"
+                f"Impact: {self.wind_gust_impact(max_wind_gust, average_wind_gust)}\n")
 
-    def wind_speed_impact(self,max_wind_speed):
+    def wind_speed_impact(self,max_wind_speed, average_wind_speed):
         if (max_wind_speed <= self.WIND_SPEED_IDEAL):
-            return (f"IDEAL (max.{max_wind_speed}kph)\n"
+            return (f"IDEAL\n"
                     f"Description: BALL TRAVELS NORMALLY ")
         elif (max_wind_speed <= self.WIND_SPEED_CHALLENGING):
             self.build_wind_timeline("speed")
-            return (f"PLAYABLE BUT CHALLENGING (max.{max_wind_speed}kph)\n"
+            return (f"PLAYABLE BUT CHALLENGING\n"
                     f"Description: BALL MAY DRIFT")
         elif (max_wind_speed < self.WIND_SPEED_DIFFICULT):
             self.build_wind_timeline("speed")
-            return (f"DIFFICULT (max.{max_wind_speed}kph)\n"
+            return (f"DIFFICULT\n"
                     f"Description: STRONG BALL DRIFT")
         else:
             self.build_wind_timeline("speed")
-            return (f"Playability: IMPOSSIBLE (max.{max_wind_speed}kph)\n"
+            return (f"IMPOSSIBLE\n"
                     f"Description: PLAY INDOORS")
 
 
-    def wind_gust_impact(self,max_wind_gust):
+    def wind_gust_impact(self,max_wind_gust, average_wind_gust):
         """
         Generates a summary of the wind gust condition for the day, including impact assessments.
 
         :return: String containing the day's wind gust status, including impact level description when applicable
         """
         if (max_wind_gust <= self.WIND_GUST_MINIMAL):
-            return (f"Impact: MINIMAL (max.{max_wind_gust}kph)\n"
+            return (f"MINIMAL\n"
                     f"Description: BALL TRAVELS NORMALLY ")
         elif (max_wind_gust <= self.WIND_GUST_MODERATE):
             self.build_wind_timeline("gust")
-            return (f"Impact: MODERATE (max.{max_wind_gust}kph)\n"
+            return (f"MODERATE\n"
                     f"Description: OCCASIONAL UNPREDICTABLE DRIFT")
         elif (max_wind_gust <= self.WIND_GUST_MAXIMUM):
             self.build_wind_timeline("gust")
-            return (f"Impact: MAXIMUM (max.{max_wind_gust}kph)\n"
+            return (f"MAXIMUM\n"
                     f"Description: SUDDEN UNPREDICTABLE BALL DEFLECTION")
         else:
             self.build_wind_timeline("gust")
-            return (f"IMPACT: BEYOND MAXIMUM (max.{max_wind_gust}kph)\n" 
+            return (f"BEYOND MAXIMUM\n" 
                     f"Description: PLAY INDOORS")
 
     def build_wind_timeline(self,metric):
