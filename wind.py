@@ -36,20 +36,27 @@ class Wind:
         ]
         return timeline[self.START_TIME:self.END_TIME]
 
-    def find_max_wind(self,time_period_forecast,metric):
+    def find_max_wind_metric(self,time_period_forecast,metric):
         """
         Identifies the highest wind speed or wind gust from the forecast data list.
 
         :param time_period_forecast: List of rain data by time slice
         :param metric: String parameter representing the metric keyword (ex. "speed" or "gust")
 
-
         :return: Integer value of the highest recorded value for the specified metric in the forecast data.
         """
         max_wind=max(each_hour[f"{metric}"] for each_hour in time_period_forecast)
         return max_wind
 
-    def calculate_average_wind(self,time_period_forecast,metric):
+    def calculate_average_wind_metric(self,time_period_forecast,metric):
+        """
+        Calculates the average wind metric value from forecast data.
+
+        :param time_period_forecast: List of wind data by time interval.
+        :param metric: String representing the wind metric to average (e.g., "speed" or "gust").
+
+        :return: Integer value of the average for the specified wind metric.
+        """
         total_sum = sum(each_hour[f"{metric}"] for each_hour in time_period_forecast)
         return round(total_sum/len(time_period_forecast))
 
@@ -61,15 +68,15 @@ class Wind:
         :return: String containing the day's wind speed status, including impact level description when applicable
         """
         time_period_forecast=self.filter_wind_metrics()
-        max_wind_speed= self.find_max_wind(time_period_forecast,"speed")
-        max_wind_gust=self.find_max_wind(time_period_forecast,"gust")
-        average_wind_speed = self.calculate_average_wind(time_period_forecast, "speed")
-        average_wind_gust = self.calculate_average_wind(time_period_forecast, "gust")
+        max_wind_speed= self.find_max_wind_metric(time_period_forecast,"speed")
+        max_wind_gust=self.find_max_wind_metric(time_period_forecast,"gust")
+        average_wind_speed = self.calculate_average_wind_metric(time_period_forecast, "speed")
+        average_wind_gust = self.calculate_average_wind_metric(time_period_forecast, "gust")
         return ("WIND SPEED:\n"
-                f"max.{max_wind_speed}kph | avg.{average_wind_speed}kph\n"
+                f"max.{max_wind_speed} kph | avg.{average_wind_speed} kph\n"
                 f"Playability: {self.wind_speed_impact(max_wind_speed, average_wind_speed)}\n"
                 f"\nWIND GUST:\n"
-                f"max.{max_wind_gust}kph | avg.{average_wind_gust}kph\n"
+                f"max.{max_wind_gust} kph | avg.{average_wind_gust} kph\n"
                 f"Impact: {self.wind_gust_impact(max_wind_gust, average_wind_gust)}\n")
 
     def wind_speed_impact(self,max_wind_speed, average_wind_speed):
