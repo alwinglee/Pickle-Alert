@@ -8,7 +8,7 @@ class Temperature:
         self.END_TIME=END_TIME+1
         self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
         self.string_builder=StringIO()
-        self.METRIC_LIST=["apparent_temperature","heat_index","uv_index"]
+        self.METRIC_LIST = []
         self.FEELS_LIKE_IDEAL = 20
         self.FEELS_LIKE_CHALLENGING = 30
         self.FEELS_LIKE_DIFFICULT = 35
@@ -39,6 +39,9 @@ class Temperature:
              "apparent_temperature": round(each_hour["feelslike_c"]), "heat_index":round(each_hour["heatindex_c"]),
              "uv_index":round(each_hour["uv"])} for each_hour in hourly
         ]
+        for each_key in list(timeline[0].keys())[1:]:
+            self.METRIC_LIST.append(each_key)
+
         return timeline[self.START_TIME:self.END_TIME]
 
     def find_max_temperature_metric(self, time_period_forecast, metric):
