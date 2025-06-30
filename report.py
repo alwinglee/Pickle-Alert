@@ -15,7 +15,7 @@ class Report:
         else:
             return f"{hour} PM"
 
-    def format_report(location_details, daylight_details, rain_details, wind_details, START_TIME, END_TIME):
+    def format_report(location_details, daylight_details, rain_details, wind_details, temperature_details, START_TIME, END_TIME):
         """
         Takes the string representation of each class and formats it into a customized report.
 
@@ -37,10 +37,6 @@ class Report:
               f"\n- - - SUMMARY - - -\n"
               f"ANALYSIS PERIOD:\n"
               f"{Report.get_am_or_pm(START_TIME)} - {Report.get_am_or_pm(END_TIME)}\n"
-              f"\nRAIN:\n"
-              f"{rain_details.rain_summary()}\n"
-              # WIND
-              f"{wind_details.wind_summary()}"
-              # Detail Rain & Wind Reports
-              f"{rain_details}"
-              f"{wind_details}")
+              f"{rain_details.rain_summary()}"
+              f"{wind_details.compile_wind_report()}"
+              f"{temperature_details.compile_temperature_report()}")
