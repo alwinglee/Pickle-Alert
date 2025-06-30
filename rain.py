@@ -15,8 +15,10 @@ class Rain:
         """
         self.weather_data=weather_data
         self.string_builder = StringIO()
+        self.METRIC_LIST=[]
         self.START_TIME=START_TIME
         self.END_TIME=END_TIME+1
+        self.TOP_TIMELINE_COUNT = TOP_TIMELINE_TIME
         self.TOP_TIMELINE_TIME=TOP_TIMELINE_TIME
         self.RAIN_CHANCE_LOW_THRESH=30
         self.RAIN_CHANCE_HIGH_THRESH = 50
@@ -35,12 +37,17 @@ class Rain:
         :return: A time-sliced list of key rain metrics.
         """
         hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
+        # Only includes hours where rain is expected (API uses 1 = Yes)
         timeline = [
             {"time":datetime.strptime(each_hour["time"],("%Y-%m-%d %H:%M")).strftime("%H:%M"),
              "rain_percentage":each_hour["chance_of_rain"],
              "rain_amount":each_hour["precip_mm"]} for each_hour in hourly if each_hour["will_it_rain"]==1
         ]
-        return timeline[self.START_TIME:self.END_TIME]
+        # Performed only if the list (timeline) is not empty
+        if (timeline):
+            for each_key in list(timeline[0].keys())[1:]:
+                self.METRIC_LIST.append(each_key)
+            return timeline[self.START_TIME:self.END_TIME]
 
     def calculate_rain_percentage(self, time_period_forecast):
         """
@@ -69,85 +76,97 @@ class Rain:
             total_precipitation+=each_hour["rain_amount"]
         return round(total_precipitation)
 
-    def rain_summary(self):
+    def compile_wind_report(self):
         """
-        Generates a summary of the rain condition for the day, including impact assessments.
+        Generates a formatted report summarizing rain conditions
 
-        :return: String containing the day's rain status, including impact level description when applicable.
+        :return: A string containing the full report, structured with headers, metrics, and impact descriptions.
         """
-        time_period_forecast = self.filter_rain_metric()
-        if (len(time_period_forecast)==0):
-            return (f"Will It Rain During This Period?: NO")
+        time_period_forecast=self.filter_rain_metric()
+        self.string_builder.write("\n- - - RAIN REPORT - - -\n")
+        if not time_period_forecast:
+            self.string_builder.write(f"Is rain expected: NO\n"
+                                      f"No Rainfall Expected. Report Omitted.\n")
         else:
             total_precipitation = self.calculate_total_precipitation(time_period_forecast)
             total_chance_of_rain = self.calculate_rain_percentage(time_period_forecast)
-            return(f"Will It Rain During This Period?: YES\n"
-                  f"- Chance of Rain: {self.chance_of_rain_impact(total_chance_of_rain)}({total_chance_of_rain}% over {self.END_TIME-self.START_TIME} hours)\n"
-                  f"- Precipitation: {self.total_precipitation_impact(total_precipitation)} (Max.{total_precipitation}mm)\n")
+            self.string_builder.write(f"Is rain expected: YES\n")
+
+            for metric in self.METRIC_LIST:
+                display_metric_title = metric.replace("_", " ")
+
+                impact = {"rain_percentage": self. chance_of_rain_impact(total_chance_of_rain),
+                          "rain_amount": self.total_precipitation_impact(total_chance_of_rain)
+                          }
+
+                value={
+                    "rain_percentage":f"{total_chance_of_rain}% over {self.END_TIME - self.START_TIME} hours",
+                    "rain_amount": f"{total_precipitation}mm"
+                }
+                self.string_builder.write(f"- - - {display_metric_title.upper()} - - ")
+                self.string_builder.write(f"{display_metric_title.title()}: {value[metric]}")
+                self.string_builder.write(f"Impact: {impact[metric]}\n")
+                self.build_rain_timeline(time_period_forecast,metric)
+        return self.string_builder.getvalue()
 
     def chance_of_rain_impact(self,total_chance_of_rain):
         """
-        Classifies rain probability into three impact levels and calls another function to generate an hourly timeline
-        of rain percentages.
+        Classifies rain probability into three impact levels and generates an hourly timeline of rain percentages.
 
-        :return: String containing the impact level and description.
+        :param total_chance_of_rain: An integer representing the highest chance of rain percentage (%) in the forecast data.
+
+        :return: A string describing the day's rain probability, including the impact level.
         """
         if (total_chance_of_rain <self.RAIN_CHANCE_LOW_THRESH):
             return ("MINIMAL RISK OF RAIN\n"
-                    "- Description: Courts Will Stay Dry And Rain Is Unlikely.")
+                    "Description: Courts Will Stay Dry And Rain Is Unlikely.")
         elif (total_chance_of_rain <self.RAIN_CHANCE_HIGH_THRESH ):
-            self.build_rain_timeline("rain_percentage","%")
             return ("MODERATE RISK OF RAIN\n"
-                    "- Description: Possible Rain. Courts May Get Wet.")
+                    "Description: Possible Rain. Courts May Get Wet.")
         else:
-            self.build_rain_timeline("rain_percentage","%")
             return ("MAXIMUM LIKELIHOOD OF RAIN\n"
-                    "- Description: Rain Guaranteed. Postpone play.")
+                    "Description: Rain Guaranteed. Postpone play.")
 
     def total_precipitation_impact(self,total_precipitation):
         """
-        Classifies rain probability into three impact levels and calls another function to generate an hourly timeline
-        of rain amount.
+        Classifies precipitation levels into three impact categories and generates an hourly timeline of rainfall amounts.
 
-        :return: String containing the impact level and description.
+        :param total_precipitation: An integer representing the maximum precipitation (mm) in the forecast data.
+
+        :return: A string describing the day's rainfall conditions, including the impact level classification.
         """
         if (total_precipitation<self.RAIN_PRECIPITATION_LOW_THRESH):
             return (f"MINIMAL AMOUNT OF RAIN"
-                    f"- Description: DRIZZLE/ LIGHT RAIN. LITTLE TO NO ACCUMULATION.")
+                    f"Description: DRIZZLE/ LIGHT RAIN. LITTLE TO NO ACCUMULATION.")
         elif (total_precipitation<self.RAIN_PRECIPITATION_MODERATE_THRESH):
-            self.build_rain_timeline("rain_amount", "mm")
             return ("MODERATE AMOUNT OF RAIN"
-                    f"- Description: STEADY RAIN. PUDDLES WILL DEVELOP.")
+                    f"Description: STEADY RAIN. PUDDLES WILL DEVELOP.")
         else:
-            self.build_rain_timeline("rain_amount", "mm")
             return ("MAXIMUM AMOUNT OF RAIN"
-                    f"- Description: HEAVY RAINFALL.")
+                    f"Description: HEAVY RAINFALL.")
 
-    def build_rain_timeline(self,metric,units):
+    def build_rain_timeline(self, time_period_forecast, metric):
         """
-        Generates hourly rain forecast data formatted as a chronological timeline.
+        Generates hourly temperature forecast data formatted as a chronological timeline.
 
         Each entry includes:
-            - Time (in `HH:MM` format)
-            - Chance of rain (%) or expected precipitation amount (mm)
+        - Time (in `HH:MM` format)
+        - Chance of Rain (%) or expected amount of total precipitation (mm)
 
         :return: None
         """
-        timeline=self.filter_rain_metric()
-        self.string_builder.write(f"- - - RAIN {metric.upper()} REPORT - - -\n"
-                                  f"Top {self.TOP_TIMELINE_TIME} Peak Rain {metric.title()} Hours:\n")
-        sort_by_max = sorted(timeline,key=lambda item:item[f"{metric}"],reverse=True)[:self.TOP_TIMELINE_TIME]
-        sort_by_time=sorted(sort_by_max,key=lambda item:item["time"])
+        display_metric_name = metric.replace("_", " ")
+        self.string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK {display_metric_name.upper()} HOURS - - -\n")
+        sort_by_max = sorted(time_period_forecast, key=lambda item: item[f"{metric}"], reverse=True)[
+                      :self.TOP_TIMELINE_COUNT]
+        sort_by_time = sorted(sort_by_max, key=lambda item: item["time"])
         for each_hour in sort_by_time:
-            self.string_builder.write(f"\t {each_hour["time"]}: {each_hour[f"{metric}"]} {units}")
+            if (metric == "rain_percentage"):
+                self.string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} % \n")
+            else:
+                self.string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} mm\n")
 
-    def __str__(self):
-        """
-        Overrides the default '__str__' method to return rain forecast data in another format.
 
-        :return: A formatted string displaying rain impact levels and forecasted rain times on separate lines.
-        """
-        return self.string_builder.getvalue()
 
 
 
