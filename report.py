@@ -37,6 +37,6 @@ class Report:
               f"\n- - - SUMMARY - - -\n"
               f"ANALYSIS PERIOD:\n"
               f"{Report.get_am_or_pm(START_TIME)} - {Report.get_am_or_pm(END_TIME)}\n"
-              f"{rain_details.rain_summary()}"
+              f"{rain_details.compile_wind_report()}"
               f"{wind_details.compile_wind_report()}"
               f"{temperature_details.compile_temperature_report()}")
