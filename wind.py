@@ -9,7 +9,7 @@ class Wind:
         self.string_builder = StringIO()
         self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
         self.weather_data=weather_data
-        self.METRIC_LIST=["speed","gust"]
+        self.METRIC_LIST=[]
         self.START_TIME=START_TIME
         self.END_TIME=END_TIME+1
         self.WIND_SPEED_IDEAL = 15
@@ -35,6 +35,10 @@ class Wind:
             {"time":datetime.strptime(each_hour["time"],("%Y-%m-%d %H:%M")).strftime("%H:%M"),
              "speed":round(each_hour["wind_kph"]), "gust":round(each_hour["gust_kph"])} for each_hour in hourly
         ]
+
+        for each_key in list(timeline[0].keys())[1:]:
+            self.METRIC_LIST.append(each_key)
+
         return timeline[self.START_TIME:self.END_TIME]
 
     def find_max_wind_metric(self,time_period_forecast,metric):
