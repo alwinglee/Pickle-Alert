@@ -4,12 +4,13 @@ from daylight import Daylight
 from rain import Rain
 from wind import Wind
 from report import Report
+from temperature import Temperature
 
 # Number of forecast days (Max 3 due to API free tier limits)
 FORECAST_DAYS = 3
 # First hour to include in analysis (24-hour format, inclusive). For single-digit hours, omit the leading zero.
 # Example: Use 9 for 9 AM, Use 0 for 12 AM, Use 23 for 11 PM
-START_TIME = 6
+START_TIME = 16
 # Last hour to include in analysis (24-hour format, inclusive). For single-digit hours, omit the leading zero.
 # Example: Use 9 for 9 AM, Use 0 for 12 AM, Use 23 for 11 PM
 END_TIME = 22
@@ -39,7 +40,9 @@ def main():
         daylight_details = Daylight(weather_data)
         rain_details = Rain(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT)
         wind_details = Wind(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT)
-        Report.format_report(location_details, daylight_details, rain_details, wind_details, START_TIME, END_TIME)
+        temperature_details = Temperature(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT)
+        Report.format_report(location_details, daylight_details, rain_details, wind_details, temperature_details, START_TIME, END_TIME)
+
     except TypeError:
         print(f"Report Generation Failed:\n"
               f"\t - Integer Input Required")
