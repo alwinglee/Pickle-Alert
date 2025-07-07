@@ -5,9 +5,8 @@ class Temperature:
     def __init__(self,weather_data, START_TIME,END_TIME,TOP_TIMELINE_COUNT):
         self.weather_data=weather_data
         self.START_TIME=START_TIME
-        self.END_TIME=END_TIME+1
+        self.END_TIME=END_TIME
         self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
-        self.string_builder=StringIO()
         self.METRIC_LIST = []
         self.FEELS_LIKE_IDEAL = 20
         self.FEELS_LIKE_CHALLENGING = 30
@@ -42,7 +41,7 @@ class Temperature:
         for each_key in list(timeline[0].keys())[1:]:
             self.METRIC_LIST.append(each_key)
 
-        return timeline[self.START_TIME:self.END_TIME]
+        return timeline[self.START_TIME:self.END_TIME+1]
 
     def find_max_temperature_metric(self, time_period_forecast, metric):
         """
@@ -75,18 +74,23 @@ class Temperature:
         :return: A string containing the full report, structured with headers, metrics, and impact descriptions.
         """
         time_period_forecast=self.filter_temperature_metrics()
+        string_builder = StringIO()
         for metric in self.METRIC_LIST:
             display_metric_title = metric.replace("_", " ")
             average = self.calculate_average_temperature_metric(time_period_forecast,metric)
             max = self.find_max_temperature_metric(time_period_forecast,metric)
             impact = {"apparent_temperature": self.apparent_temperature_impact(max),
                       "heat_index": self.heat_index_impact(max),
-                      "uv_index": self.uv_index_impact(max)}
-            self.string_builder.write (f"\n- - - {display_metric_title.upper()} REPORT - - -\n"
-                                        f"Max. {max} | Avg. {average} \n")
-            self.string_builder.write(f"Impact: {impact[metric]}\n")
-            self.build_temperature_timeline(time_period_forecast,metric)
-        return self.string_builder.getvalue()
+                      "uv_index": self.uv_index_impact(max)
+                      }
+            string_builder.write (f"\n- - - {display_metric_title.upper()} REPORT - - -\n")
+            if metric=="uv_index":
+                string_builder.write(f"Max. index {max}  | Avg. index {average}\n")
+            else:
+                string_builder.write(f"Max. {max} °C | Avg. {average} °C \n")
+            string_builder.write(f"Impact: {impact[metric]}\n")
+            string_builder.write(self.build_temperature_timeline(time_period_forecast,metric))
+        return string_builder.getvalue()
 
     def apparent_temperature_impact(self, max_apparent_temperature):
         """
@@ -162,15 +166,17 @@ class Temperature:
 
         :return: None
         """
+        string_builder = StringIO()
         display_metric_name= metric.replace("_"," ")
-        self.string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK {display_metric_name.upper()} HOURS - - -\n")
+        string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK {display_metric_name.upper()} HOURS - - -\n")
         sort_by_max= sorted(time_period_forecast, key=lambda item:item[f"{metric}"],reverse=True)[:self.TOP_TIMELINE_COUNT]
         sort_by_time = sorted(sort_by_max,key=lambda item:item["time"])
         for each_hour in sort_by_time:
             if (metric == "uv_index"):
-                self.string_builder.write(f"\t{each_hour["time"]}: lvl. {each_hour[f"{metric}"]} \n")
+                string_builder.write(f"\t{each_hour["time"]}: Index {each_hour[f"{metric}"]} \n")
             else:
-                self.string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} °C\n")
+                string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} °C\n")
+        return string_builder.getvalue()
 
 
 
