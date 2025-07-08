@@ -14,7 +14,6 @@ class Daylight:
         self.sunrise = weather_data["forecast"]["forecastday"][0]["astro"]["sunrise"]
         self.sunset = weather_data["forecast"]["forecastday"][0]["astro"]["sunset"]
 
-
     def convert_to_military_time(self,time):
         """
         Converts standard time from API data to military time (24-hour format) for sunrise or sunset.
