@@ -11,7 +11,7 @@ class Wind:
         self.weather_data=weather_data
         self.METRIC_LIST=[]
         self.START_TIME=START_TIME
-        self.END_TIME=END_TIME+1
+        self.END_TIME=END_TIME
         self.WIND_SPEED_IDEAL = 15
         self.WIND_SPEED_CHALLENGING = 24
         self.WIND_SPEED_DIFFICULT= 32
@@ -39,7 +39,7 @@ class Wind:
         for each_key in list(timeline[0].keys())[1:]:
             self.METRIC_LIST.append(each_key)
 
-        return timeline[self.START_TIME:self.END_TIME]
+        return timeline[self.START_TIME:self.END_TIME+1]
 
     def find_max_wind_metric(self,time_period_forecast,metric):
         """
@@ -78,7 +78,7 @@ class Wind:
             max = self.find_max_wind_metric(time_period_forecast,metric)
             impact = {"speed": self.wind_speed_impact(max),
                       "gust": self.wind_gust_impact(max)}
-            self.string_builder.write (f"\n- - - WIND {display_metric_title.upper()} REPORT - - -\n"
+            self.string_builder.write (f"\n= = = WIND {display_metric_title.upper()} REPORT = = =\n"
                                         f"Max. {max} kph | Avg. {average} kph \n")
             self.string_builder.write(f"Impact: {impact[metric]}\n")
             self.build_wind_timeline(time_period_forecast,metric)
