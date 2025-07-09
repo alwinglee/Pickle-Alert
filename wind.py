@@ -12,12 +12,10 @@ class Wind:
         self.METRIC_LIST=[]
         self.START_TIME=START_TIME
         self.END_TIME=END_TIME
-        self.WIND_SPEED_IDEAL = 15
-        self.WIND_SPEED_CHALLENGING = 24
-        self.WIND_SPEED_DIFFICULT= 32
-        self.WIND_GUST_MINIMAL = 18
-        self.WIND_GUST_MODERATE = 26
-        self.WIND_GUST_MAXIMUM = 32
+        self.WIND_SPEED_LOW = 15
+        self.WIND_SPEED_MODERATE = 25
+        self.WIND_GUST_LOW = 20
+        self.WIND_GUST_MODERATE = 35
 
     def filter_wind_metrics(self):
         """
@@ -35,10 +33,8 @@ class Wind:
             {"time":datetime.strptime(each_hour["time"],("%Y-%m-%d %H:%M")).strftime("%H:%M"),
              "speed":round(each_hour["wind_kph"]), "gust":round(each_hour["gust_kph"])} for each_hour in hourly
         ]
-
         for each_key in list(timeline[0].keys())[1:]:
             self.METRIC_LIST.append(each_key)
-
         return timeline[self.START_TIME:self.END_TIME+1]
 
     def find_max_wind_metric(self,time_period_forecast,metric):
@@ -92,18 +88,12 @@ class Wind:
 
         :return: A string describing the day's wind speed conditions, including the impact level.
         """
-        if (max_wind_speed <= self.WIND_SPEED_IDEAL):
-            return (f"IDEAL\n"
-                    f"Description: BALL TRAVELS NORMALLY ")
-        if (max_wind_speed <= self.WIND_SPEED_CHALLENGING):
-            return (f"PLAYABLE BUT CHALLENGING\n"
-                    f"Description: BALL MAY DRIFT")
-        elif (max_wind_speed < self.WIND_SPEED_DIFFICULT):
-            return (f"DIFFICULT\n"
-                    f"Description: STRONG BALL DRIFT")
+        if (max_wind_speed <= self.WIND_SPEED_LOW):
+            return (f"🟩 LOW (PREDICTIABLE MOVEMENT)")
+        elif (max_wind_speed <= self.WIND_SPEED_MODERATE):
+            return (f"🟨 MODERATE (NOTICEABLE CURVE AND SPEED CHANGES)")
         else:
-            return (f"IMPOSSIBLE\n"
-                    f"Description: PLAY INDOORS")
+            return (f"🟥 HIGH (ERRATIC AND UNCONTROLLABLE)")
 
     def wind_gust_impact(self,max_wind_gust):
         """
@@ -113,18 +103,12 @@ class Wind:
 
         :return: A string describing the day's wind gust conditions, including the impact level.
         """
-        if (max_wind_gust <= self.WIND_GUST_MINIMAL):
-            return (f"MINIMAL\n"
-                    f"Description: BALL TRAVELS NORMALLY ")
+        if (max_wind_gust <= self.WIND_GUST_LOW):
+            return (f"🟩 LOW (MINOR UNPREDICTABILITY)")
         elif (max_wind_gust <= self.WIND_GUST_MODERATE):
-            return (f"MODERATE\n"
-                    f"Description: OCCASIONAL UNPREDICTABLE DRIFT")
-        elif (max_wind_gust <= self.WIND_GUST_MAXIMUM):
-            return (f"MAXIMUM\n"
-                    f"Description: SUDDEN UNPREDICTABLE BALL DEFLECTION")
+            return (f"🟨 MODERATE (NOTICEABLE BALL SWERVE)")
         else:
-            return (f"BEYOND MAXIMUM\n" 
-                    f"Description: PLAY INDOORS")
+            return (f"🟥 HIGH (SEVERE DISRUPTION)")
 
     def build_wind_timeline(self,time_period_forecast,metric):
         """
@@ -142,6 +126,11 @@ class Wind:
         sort_by_time = sorted(sort_by_max, key=lambda item: item["time"])
         for each_hour in sort_by_time:
                 self.string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} kph\n")
+
+
+
+
+
 
 
 
