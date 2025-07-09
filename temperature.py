@@ -8,17 +8,14 @@ class Temperature:
         self.END_TIME=END_TIME
         self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
         self.METRIC_LIST = []
-        self.FEELS_LIKE_IDEAL = 20
-        self.FEELS_LIKE_CHALLENGING = 30
-        self.FEELS_LIKE_DIFFICULT = 35
+        self.APPARENT_TEMPERATURE_LOW = 24
+        self.APPARENT_TEMPERATURE_MODERATE = 33
         self.UV_INDEX_LOW = 2
         self.UV_INDEX_MODERATE= 5
         self.UV_INDEX_HIGH = 7
         self.UV_INDEX_VERY_HIGH = 10
         self.HEAT_INDEX_LOW = 25
-        self.HEAT_INDEX_MODERATE = 32
-        self.HEAT_INDEX_HIGH = 38
-        self.HEAT_INDEX_VERY_HIGH = 35
+        self.HEAT_INDEX_MODERATE = 33
 
     def filter_temperature_metrics(self):
         """
@@ -67,6 +64,7 @@ class Temperature:
         total_sum = sum(each_hour[f"{metric}"] for each_hour in time_period_forecast)
         return round(total_sum/len(time_period_forecast))
 
+
     def compile_temperature_report(self):
         """
         Generates a formatted report summarizing temperature conditions
@@ -100,18 +98,12 @@ class Temperature:
 
         :return: A string describing the day's apparent temperature conditions, including the impact level.
         """
-        if (max_apparent_temperature<= self.FEELS_LIKE_IDEAL):
-            return (f"IDEAL\n"
-                    f"Description: COMFORTABLE TEMPERATURE FOR OUTDOOR PLAY.")
-        if (max_apparent_temperature <= self.FEELS_LIKE_CHALLENGING):
-            return (f"PLAYABLE BUT WARM\n"
-                    f"Description: HYDRATE FREQUENTLY. TAKE BREAKS.")
-        elif (max_apparent_temperature < self.FEELS_LIKE_DIFFICULT):
-            return (f"RISKY\n"
-                    f"Description: HIGH EXERTION RISK AND SHORTEN GAMES. CONSIDER PLAYING INDOORS.")
+        if (max_apparent_temperature<= self.APPARENT_TEMPERATURE_LOW):
+            return (f"🟩 LOW (COMFORTABLE)")
+        elif (max_apparent_temperature <= self.APPARENT_TEMPERATURE_MODERATE):
+            return (f"🟨 MODERATE(HEAT FATIGUE)")
         else:
-            return (f"DANGEROUS\n"
-                    f"Description: RISK OF HEATSTROKE. PLAY INDOORS.")
+            return (f"🟥 HIGH (DANGEROUS HEAT)")
     def heat_index_impact(self, max_heat_index):
         """
         Generates a summary of the heat index conditions for the day, including impact assessments.
@@ -120,18 +112,13 @@ class Temperature:
 
         :return: A string describing the day's heat index conditions, including the impact level.
         """
-        if (max_heat_index <= self.FEELS_LIKE_IDEAL):
-            return (f"IDEAL\n"
-                    f"\tDescription: COMFORTABLE TEMPERATURE FOR OUTDOOR PLAY.")
-        if (max_heat_index <= self.FEELS_LIKE_CHALLENGING):
-            return (f"PLAYABLE BUT WARM\n"
-                    f"Description: HYDRATE FREQUENTLY. TAKE BREAKS.")
-        elif (max_heat_index < self.FEELS_LIKE_DIFFICULT):
-            return (f"RISKY\n"
-                    f"Description: HIGH EXERTION RISK AND SHORTEN GAMES. CONSIDER PLAYING INDOORS.")
+        if (max_heat_index <= self.HEAT_INDEX_LOW):
+            return (f"🟩 LOW (COMFORTABLE) ")
+        elif (max_heat_index <= self.HEAT_INDEX_MODERATE):
+            return (f"🟨 MODERATE (NOTICEABLE SWEATING)")
         else:
-            return (f"DANGEROUS\n"
-                    f"Description: RISK OF HEATSTROKE. PLAY INDOORS.")
+            return (f"🟥 DANGEROUS (HEAT CRAMPS LIKELY)")
+
     def uv_index_impact(self,max_uv_index):
         """
        Generates a summary of the UV index conditions for the day, including impact assessments.
@@ -141,20 +128,15 @@ class Temperature:
        :return: A string describing the day's uv index conditions, including the impact level.
        """
         if (max_uv_index<= self.UV_INDEX_LOW):
-            return (f"LOW\n"
-                    f"Description: MINIMAL RISK. BURN TIME OF 60 MINS.")
-        if  (max_uv_index <= self.UV_INDEX_MODERATE):
-            return (f"MODERATE\n"
-                    f"Description: WEAR SPF 30+ SUNSCREEN. BURN TIME OF 45 MINS.")
+            return (f"🟩 LOW (60 MIN. BURN TIME)")
+        elif  (max_uv_index <= self.UV_INDEX_MODERATE):
+            return (f"🟨 MODERATE (45 MIN. BURN TIME)")
         elif (max_uv_index < self.UV_INDEX_HIGH):
-            return (f"HIGH\n"
-                    f"Description: WEAR SPF 50+ SUNSCREEN. BURN TIME OF 30 MINS")
+            return (f"🟥 HIGH (30 MIN. BURN TIME")
         elif (max_uv_index < self.UV_INDEX_VERY_HIGH):
-            return (f"VERY HIGH\n"
-                    f"Description: LIMIT SESSION TO 1-2 HOURS. BURN TIME OF 20 MINS")
+            return (f"🟥 VERY HIGH (15 MIN. BURN TIME")
         else:
-            return (f"EXTREME\n"
-                    f"Description: RESCHEDULE PICKEBALL SESSION OR PLAY INDOORS. BURN TIME OF 10 MINS")
+            return (f"🟥 EXTREME (STAY INDOORS)")
 
     def build_temperature_timeline(self,time_period_forecast, metric):
         """
