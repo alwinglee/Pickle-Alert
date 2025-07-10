@@ -127,14 +127,14 @@ class Rain:
         string_builder=StringIO()
         time_period_forecast = self.filter_rain_metric((self.START_TIME-self.RAIN_CHECK_HOURS_PRIOR),self.START_TIME)
         total_precipitation = self.calculate_total_precipitation(time_period_forecast)
-        string_builder.write(f"Precip. last {self.RAIN_CHECK_HOURS_PRIOR} hours before {self.START_TIME}:00?: ")
+        string_builder.write(f"Precipitation last {self.RAIN_CHECK_HOURS_PRIOR} hours before {self.START_TIME}:00?: ")
         if not (time_period_forecast):
             string_builder.write(f"NO (REPORT OMITTED)\n")
         else:
             last_hour_of_rain = (time_period_forecast[-1]["time"])
             string_builder.write(f"YES\n")
             string_builder.write(f"Rained {len(time_period_forecast)}/{self.RAIN_CHECK_HOURS_PRIOR} hour (Last {last_hour_of_rain}) | "
-                                 f"{total_precipitation}mm \n")
+                                 f"{total_precipitation} mm\n")
             string_builder.write(self.build_rain_timeline(time_period_forecast))
         return string_builder.getvalue()
 

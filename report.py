@@ -1,4 +1,6 @@
 from datetime import datetime
+import os
+from twilio.rest import Client
 class Report:
     """
     Gathers reports from other metric classes into the main Report class, preparing the data for full report generation
@@ -23,9 +25,13 @@ class Report:
         print(f"{self.location_details}\n"
               f"{self.daylight_details}\n"
               f"\n- - - SUMMARY - - -\n"
-              f"ANALYSIS PERIOD:\n"
+              f"ANALYSIS PERIOD: "
               f"{self.START_TIME} - {self.END_TIME} ({self.total_hours} hours)\n"
+              f"{self.wind_details.wind_summary()}"
+              f"{self.temperature_details.temperature_summary()}"
+              f"\n= = = PRE-RAIN REPORT = = =\n"
               f"{self.rain_details.compile_pre_window_rain_report()}"
+              f"\n= = = RAIN REPORT = = =\n"
               f"{self.rain_details.compile_during_window_rain_report()}"
               f"{self.wind_details.compile_wind_report()}"
               f"{self.temperature_details.compile_temperature_report()}")

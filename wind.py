@@ -146,8 +146,6 @@ class Wind:
             string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} kph\n")
         return string_builder.getvalue()
 
-<<<<<<< HEAD
-
     def select_impact_method(self,metric,max):
         """
         Selects the appropriate impact method based on the given parameters.
