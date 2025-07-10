@@ -81,11 +81,14 @@ class Wind:
         return string_builder.getvalue()
 
     def wind_summary(self):
+<<<<<<< HEAD
         """
         Generates a summary of impact levels for all wind metrics
 
         :return: Formatted string with impact levels for all wind metrics
         """
+=======
+>>>>>>> eac75f376647d385c5cd8dec91e99fbf705e0363
         string_builder=StringIO()
         time_period_forecast=self.filter_wind_metrics()
         for metric in self.METRIC_LIST:
@@ -146,6 +149,7 @@ class Wind:
             string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} kph\n")
         return string_builder.getvalue()
 
+<<<<<<< HEAD
 
     def select_impact_method(self,metric,max):
         """
@@ -156,6 +160,9 @@ class Wind:
 
         :return: String describing the impact level corresponding to the max value
         """
+=======
+    def select_impact_method(self,metric,max):
+>>>>>>> eac75f376647d385c5cd8dec91e99fbf705e0363
         method = {"speed": self.wind_speed_impact,
                   "gust": self.wind_gust_impact}
         return method[metric](max)
