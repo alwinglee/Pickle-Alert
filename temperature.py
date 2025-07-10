@@ -89,6 +89,11 @@ class Temperature:
         return string_builder.getvalue()
 
     def temperature_summary(self):
+        """
+        Generates a summary of impact levels for all temperature metrics
+
+        :return: Formatted string with impact levels for temperature metrics
+        """
         string_builder=StringIO()
         time_period_forecast=self.filter_temperature_metrics()
         for metric in self.METRIC_LIST:
@@ -172,6 +177,14 @@ class Temperature:
         return string_builder.getvalue()
 
     def select_impact_method(self, metric, max):
+        """
+        Selects the appropriate impact method based on the given parameters.
+
+        :param metric: Key indicating which wind metric to display ("speed" or "gust")
+        :param max: Maximum value (integer) found in the metric dataset
+
+        :return: String describing the impact level corresponding to the max value
+        """
         method = {"apparent_temperature": self.apparent_temperature_impact,
                   "heat_index": self.heat_index_impact,
                   "uv_index":self.uv_index_impact}
