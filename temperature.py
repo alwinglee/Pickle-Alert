@@ -77,17 +77,25 @@ class Temperature:
             display_metric_title = metric.replace("_", " ")
             average = self.calculate_average_temperature_metric(time_period_forecast,metric)
             max = self.find_max_temperature_metric(time_period_forecast,metric)
-            impact = {"apparent_temperature": self.apparent_temperature_impact(max),
-                      "heat_index": self.heat_index_impact(max),
-                      "uv_index": self.uv_index_impact(max)
-                      }
+            impact = self.select_impact_method(metric,max)
+
             string_builder.write (f"\n- - - {display_metric_title.upper()} REPORT - - -\n")
             if metric=="uv_index":
                 string_builder.write(f"Max. index {max}  | Avg. index {average}\n")
             else:
                 string_builder.write(f"Max. {max} °C | Avg. {average} °C \n")
-            string_builder.write(f"Impact: {impact[metric]}\n")
+            string_builder.write(f"Impact: {impact}\n")
             string_builder.write(self.build_temperature_timeline(time_period_forecast,metric))
+        return string_builder.getvalue()
+
+    def temperature_summary(self):
+        string_builder=StringIO()
+        time_period_forecast=self.filter_temperature_metrics()
+        for metric in self.METRIC_LIST:
+            display_metric_title = metric.replace("_", " ").title()
+            max = self.find_max_temperature_metric(time_period_forecast, metric)
+            impact = self.select_impact_method(metric,max)
+            string_builder.write(f"{display_metric_title}: {impact}\n")
         return string_builder.getvalue()
 
     def apparent_temperature_impact(self, max_apparent_temperature):
@@ -140,13 +148,16 @@ class Temperature:
 
     def build_temperature_timeline(self,time_period_forecast, metric):
         """
-        Generates hourly temperature forecast data formatted as a chronological timeline.
+        Generates hourly temperature forecast data formatted as a chronological timeline
 
         Each entry includes:
         - Time (in `HH:MM` format)
-        - Apparent Temperature (°C), Heat Index (°C), or UV Index (lvl.)
+        - Apparent Temperature (°C), Heat Index (°C), or UV Index (index.)
 
-        :return: None
+        :param time_period_forecast: List of wind data points by time interval
+        :param metric: Key indicating which wind metric to display ("apparent_temperature","heat_index", or "uv_index")
+
+        :return: Formatted string showing chronological timeline entries for the specified metric
         """
         string_builder = StringIO()
         display_metric_name= metric.replace("_"," ")
@@ -159,6 +170,12 @@ class Temperature:
             else:
                 string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} °C\n")
         return string_builder.getvalue()
+
+    def select_impact_method(self, metric, max):
+        method = {"apparent_temperature": self.apparent_temperature_impact,
+                  "heat_index": self.heat_index_impact,
+                  "uv_index":self.uv_index_impact}
+        return method[metric](max)
 
 
 
