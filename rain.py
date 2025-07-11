@@ -109,9 +109,10 @@ class Rain:
         """
         string_builder = StringIO()
         time_period_forecast = self.filter_rain_metric(self.START_TIME, self.END_TIME)
+        rain_status = self.rain_status(time_period_forecast)
         string_builder.write(f"Is rain expected: ")
         if not time_period_forecast:
-            string_builder.write(f"NO (REPORT OMITTED)\n")
+            string_builder.write(f"{rain_status} (REPORT OMITTED)\n")
             return string_builder.getvalue()
         else:
             total_precipitation = self.calculate_total_precipitation(time_period_forecast)
@@ -122,7 +123,8 @@ class Rain:
             total_precipitation_result=self.total_precipitation_impact(total_precipitation)
             number_of_hour_of_rain = len(time_period_forecast)
 
-            string_builder.write(f"YES\n"
+
+            string_builder.write(f"{rain_status}\n"
                                  f"Will Rain {number_of_hour_of_rain}/{self.total_hours} hours ({rain_coverage_percentage}%)"
                                  f"| Avg. Chance: {weighted_rain_probability}% | {total_precipitation} mm\n")
             string_builder.write (f"Rain Probability:{weighted_rain_probability_result}\n"
@@ -140,13 +142,14 @@ class Rain:
         string_builder = StringIO()
         time_period_forecast = self.filter_rain_metric(self.PRE_RAIN_WINDOW_START, self.START_TIME)
         total_precipitation = self.calculate_total_precipitation(time_period_forecast)
+        rain_status =self.rain_status(time_period_forecast)
         string_builder.write(f"Did It Rain {self.RAIN_CHECK_HOURS_PRIOR} hours before {self.START_TIME}:00?: ")
         if not (time_period_forecast):
-            string_builder.write(f"NO (REPORT OMITTED)\n")
+            string_builder.write(f"{rain_status}(REPORT OMITTED)\n")
         else:
             last_rain_hour = (time_period_forecast[-1]["time"])
             impact= self.assess_pre_window_impact(last_rain_hour)
-            string_builder.write(f"YES\n"
+            string_builder.write(f"{rain_status}\n"
                                  f"Rained {len(time_period_forecast)}/{self.RAIN_CHECK_HOURS_PRIOR} last hours (Last {last_rain_hour}) | "
                                  f"{total_precipitation} mm\n")
             string_builder.write(f"Impact: {impact}\n")
@@ -171,6 +174,28 @@ class Rain:
             return ("🟨 MODERATE (DELAY START/CHECK COURT CONDITIONS)")
         else:
             return ("🟥 HIGH (POSTPONE)")
+
+    def rain_summary(self):
+        """
+        Generates a summary of impact levels for rainfall occurring both before and during the assessed time period
+
+        :return: A formatted string describing the impact levels of precipitation prior to and  during the specified
+        time window
+        """
+        string_builder=StringIO()
+        string_builder.write (f"Rain Earlier: {self.rain_status(self.filter_rain_metric(self.PRE_RAIN_WINDOW_START, self.START_TIME))}\n"
+                f"Rain Expected: {self.rain_status(self.filter_rain_metric(self.START_TIME, self.END_TIME))}\n")
+        return string_builder.getvalue()
+
+    def rain_status(self,time_period_forecasted):
+        """
+        Assesses whether the array contains any rainfall data and returns the status as a string.
+
+        :returns: 'Yes' if rain was detected, otherwise 'No'.
+        """
+        return "🟩 YES" if (time_period_forecasted) else "🟥 NO"
+
+
     def weighted_rain_probability_impact(self,weighted_rain_probability):
         """
         Classifies weighted rain probability into three impact levels
