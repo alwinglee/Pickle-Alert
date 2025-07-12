@@ -16,6 +16,9 @@ class Temperature:
         self.UV_INDEX_VERY_HIGH = 10
         self.HEAT_INDEX_LOW = 25
         self.HEAT_INDEX_MODERATE = 33
+        self.HUMIDITY_LOW = 30
+        self.HUMIDITY_MODERATE = 60
+        self.HUMIDITY_HIGH = 75
 
     def filter_temperature_metrics(self):
         """
@@ -31,7 +34,8 @@ class Temperature:
         hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
         timeline = [
             {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
-             "apparent_temperature": round(each_hour["feelslike_c"]), "uv_index": round(each_hour["uv"])} for each_hour in hourly
+             "apparent_temperature": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
+             "uv_index": round(each_hour["uv"])} for each_hour in hourly
         ]
         self.METRIC_LIST = list(timeline[0].keys())[1:]
         return timeline[self.START_TIME:self.END_TIME+1]
@@ -75,12 +79,14 @@ class Temperature:
             max = self.find_max_temperature_metric(time_period_forecast,metric)
             impact = self.select_impact_method(metric,max)
 
-            string_builder.write (f"\n- - - {display_metric_title.upper()} REPORT - - -\n")
+            string_builder.write (f"\n- - - ☀️ {display_metric_title.upper()} REPORT ☀️ - - -\n")
             if metric=="uv_index":
                 string_builder.write(f"Max. index {max}  | Avg. index {average}\n")
+            elif metric=="humidity":
+                string_builder.write(f"Max. {max} % | Avg. {average} %\n")
             else:
                 string_builder.write(f"Max. {max} °C | Avg. {average} °C \n")
-            string_builder.write(f"Impact: {impact}\n")
+            string_builder.write(f"{impact}\n")
             string_builder.write(self.build_temperature_timeline(time_period_forecast,metric))
         return string_builder.getvalue()
 
@@ -133,6 +139,23 @@ class Temperature:
         else:
             return (f"🟥 EXTREME (STAY INDOORS)")
 
+    def humidity_impact(self, max_humidity):
+        """
+       Generates a summary of the humidity conditions for the day, including impact assessments.
+
+       :param max_humidity: An integer representing the highest humidity in the forecast data.
+
+       :return: A string describing the day's humidity conditions, including the impact level.
+       """
+        if (max_humidity <= self.HUMIDITY_LOW):
+            return (f"🟩 LOW (FAST DEHYDRATION)")
+        elif (max_humidity <= self.HUMIDITY_MODERATE):
+            return (f"🟨 MODERATE (COMFORTABLE)")
+        elif (max_humidity< self.HUMIDITY_HIGH):
+            return (f"🟥 HIGH (AIR FEELS STICKY)")
+        else:
+            return (f"🟥 EXTREME (EXHAUSTION RISK)")
+
     def build_temperature_timeline(self,time_period_forecast, metric):
         """
         Generates hourly temperature forecast data formatted as a chronological timeline
@@ -154,6 +177,8 @@ class Temperature:
         for each_hour in sort_by_time:
             if (metric == "uv_index"):
                 string_builder.write(f"\t{each_hour["time"]}: Index {each_hour[f"{metric}"]} \n")
+            elif(metric=="humidity"):
+                string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} % \n")
             else:
                 string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} °C\n")
         return string_builder.getvalue()
@@ -162,12 +187,13 @@ class Temperature:
         """
         Selects the appropriate impact method based on the given parameters.
 
-        :param metric: Key indicating which wind metric to display ("speed" or "gust")
+        :param metric: Key indicating which temperature metric to display ("apparent temperature", "humidity", or "uv index")
         :param max: Maximum value (integer) found in the metric dataset
 
         :return: String describing the impact level corresponding to the max value
         """
         method = {"apparent_temperature": self.apparent_temperature_impact,
+                  "humidity":self.humidity_impact,
                   "uv_index":self.uv_index_impact}
         return method[metric](max)
 
