@@ -24,7 +24,6 @@ class Temperature:
         Each entry contains the following key-value pairs:
             - Time
             - Apparent Temperature
-            - Heat Index
             - Uv Index
 
         :return: A time-sliced list of key temperature metrics.
@@ -32,12 +31,9 @@ class Temperature:
         hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
         timeline = [
             {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
-             "apparent_temperature": round(each_hour["feelslike_c"]), "heat_index":round(each_hour["heatindex_c"]),
-             "uv_index":round(each_hour["uv"])} for each_hour in hourly
+             "apparent_temperature": round(each_hour["feelslike_c"]), "uv_index": round(each_hour["uv"])} for each_hour in hourly
         ]
-        for each_key in list(timeline[0].keys())[1:]:
-            self.METRIC_LIST.append(each_key)
-
+        self.METRIC_LIST = list(timeline[0].keys())[1:]
         return timeline[self.START_TIME:self.END_TIME+1]
 
     def find_max_temperature_metric(self, time_period_forecast, metric):
@@ -45,7 +41,7 @@ class Temperature:
         Identifies the highest temperature metric from the forecast data list.
 
         :param time_period_forecast: List of rain data by time slice
-        :param metric: String parameter representing the metric keyword (ex. "apparent temperature" or "heat index")
+        :param metric: String parameter representing the metric keyword (ex. "apparent temperature" or "UV index")
 
         :return: Integer value of the highest recorded value for the specified metric in the forecast data.
         """
@@ -57,7 +53,7 @@ class Temperature:
         Calculates the average temperature metric value from forecast data.
 
         :param time_period_forecast: List of wind data by time interval.
-        :param metric: String representing the temperature metric to average (e.g., "apparent temperature" or "heat index").
+        :param metric: String representing the temperature metric to average (e.g., "apparent temperature" or "UV index").
 
         :return: Integer value of the average for the specified temperature metric.
         """
@@ -114,23 +110,9 @@ class Temperature:
         if (max_apparent_temperature<= self.APPARENT_TEMPERATURE_LOW):
             return (f"🟩 LOW (COMFORTABLE)")
         elif (max_apparent_temperature <= self.APPARENT_TEMPERATURE_MODERATE):
-            return (f"🟨 MODERATE(HEAT FATIGUE)")
+            return (f"🟨 MODERATE (HEAT FATIGUE)")
         else:
             return (f"🟥 HIGH (DANGEROUS HEAT)")
-    def heat_index_impact(self, max_heat_index):
-        """
-        Generates a summary of the heat index conditions for the day, including impact assessments.
-
-        :param max_heat_index: An integer representing the highest heat index in the forecast data.
-
-        :return: A string describing the day's heat index conditions, including the impact level.
-        """
-        if (max_heat_index <= self.HEAT_INDEX_LOW):
-            return (f"🟩 LOW (COMFORTABLE) ")
-        elif (max_heat_index <= self.HEAT_INDEX_MODERATE):
-            return (f"🟨 MODERATE (NOTICEABLE SWEATING)")
-        else:
-            return (f"🟥 DANGEROUS (HEAT CRAMPS LIKELY)")
 
     def uv_index_impact(self,max_uv_index):
         """
@@ -145,9 +127,9 @@ class Temperature:
         elif  (max_uv_index <= self.UV_INDEX_MODERATE):
             return (f"🟨 MODERATE (45 MIN. BURN TIME)")
         elif (max_uv_index < self.UV_INDEX_HIGH):
-            return (f"🟥 HIGH (30 MIN. BURN TIME")
+            return (f"🟥 HIGH (30 MIN. BURN TIME)")
         elif (max_uv_index < self.UV_INDEX_VERY_HIGH):
-            return (f"🟥 VERY HIGH (15 MIN. BURN TIME")
+            return (f"🟥 VERY HIGH (15 MIN. BURN TIME)")
         else:
             return (f"🟥 EXTREME (STAY INDOORS)")
 
@@ -157,7 +139,7 @@ class Temperature:
 
         Each entry includes:
         - Time (in `HH:MM` format)
-        - Apparent Temperature (°C), Heat Index (°C), or UV Index (index.)
+        - Apparent Temperature (°C) or UV Index (index.)
 
         :param time_period_forecast: List of wind data points by time interval
         :param metric: Key indicating which wind metric to display ("apparent_temperature","heat_index", or "uv_index")
@@ -186,7 +168,6 @@ class Temperature:
         :return: String describing the impact level corresponding to the max value
         """
         method = {"apparent_temperature": self.apparent_temperature_impact,
-                  "heat_index": self.heat_index_impact,
                   "uv_index":self.uv_index_impact}
         return method[metric](max)
 
