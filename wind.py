@@ -32,8 +32,7 @@ class Wind:
             {"time":datetime.strptime(each_hour["time"],("%Y-%m-%d %H:%M")).strftime("%H:%M"),
              "speed":round(each_hour["wind_kph"]), "gust":round(each_hour["gust_kph"])} for each_hour in hourly
         ]
-        for each_key in list(timeline[0].keys())[1:]:
-            self.METRIC_LIST.append(each_key)
+        self.METRIC_LIST = list(timeline[0].keys())[1:]
         return timeline[self.START_TIME:self.END_TIME+1]
 
     def find_max_wind_metric(self,time_period_forecast,metric):
