@@ -16,9 +16,7 @@ class Rain:
         self.weather_data=weather_data
         self.METRIC_LIST=[]
         self.START_TIME=START_TIME
-        self.START_TIME_DATETIME= datetime.strptime(f"{self.START_TIME:02d}:00", "%H:%M").time()
         self.END_TIME=END_TIME
-        self.END_TIME_DATETIME= datetime.strptime(f"{self.END_TIME:02d}:00", "%H:%M").time()
         self.total_hours=total_hours
         self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
         self.RAIN_CHECK_HOURS_PRIOR=RAIN_CHECK_HOURS_PRIOR
@@ -32,6 +30,17 @@ class Rain:
         self.RAIN_COVERAGE_MODERATE=60
         self.LAST_HOUR_IMPACT_LOW=3
         self.LAST_HOUR_IMPACT_MODERATE=2
+
+
+    def convert_to_datetime(self,time):
+        """
+        Converts an integer time value (START_TIME or END_TIME) to a datetime object.
+
+        :param time: An integer representing either the start time or end time in hours (24-hour format)
+
+        :return: A datetime object formatted to display military time (hours and minutes)
+        """
+        return datetime.strptime("23:59" if time == 24 else f"{time:02d}:00", "%H:%M").time()
 
     def filter_rain_metric(self,START_TIME,END_TIME):
         """
@@ -47,16 +56,18 @@ class Rain:
         hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
         self.METRIC_LIST=[]
         timeline = []
-        self.START_TIME_DATETIME = datetime.strptime(f"{START_TIME:02d}:00", "%H:%M").time()
-        self.END_TIME_DATETIME = datetime.strptime(f"{END_TIME:02d}:00", "%H:%M").time()
+
+        start_time_datetime = self.convert_to_datetime(START_TIME)
+        end_time_datetime=self.convert_to_datetime(END_TIME)
 
         for each_hour in hourly:
             time_datetime_conversion =  datetime.strptime(each_hour["time"],"%Y-%m-%d %H:%M").time()
 
             # Only includes hours where rain is expected (API uses 1 = Yes)
-            if (time_datetime_conversion>= self.START_TIME_DATETIME and time_datetime_conversion <=self.END_TIME_DATETIME) and each_hour["will_it_rain"]==1:
+            if (start_time_datetime<=time_datetime_conversion <= end_time_datetime) and each_hour["will_it_rain"]==1:
                 timeline.append({
                     "time": time_datetime_conversion.strftime("%H:%M"),
+                    "cloud_percentage": each_hour["cloud"],
                     "rain_percentage":each_hour["chance_of_rain"],
                     "rain_amount":each_hour["precip_mm"],
                 })
@@ -111,7 +122,7 @@ class Rain:
         string_builder = StringIO()
         time_period_forecast = self.filter_rain_metric(self.START_TIME, self.END_TIME)
         rain_status = self.rain_status(time_period_forecast)
-        string_builder.write(f"\n= = = 🌦️ RAIN REPORT 🌦️ = = =\n")
+        string_builder.write(f"\n= = = 🌦️ RAIN 🌦️ = = =\n")
         if not time_period_forecast:
             string_builder.write(f"{rain_status} RAIN (REPORT OMITTED)\n")
             return string_builder.getvalue()
@@ -126,8 +137,8 @@ class Rain:
 
             string_builder.write(f"Rain {number_of_hour_of_rain}/{self.total_hours} hours ({rain_coverage_percentage}%)"
                                  f"| Avg. Chance: {weighted_rain_probability}% | {total_precipitation} mm\n")
-            string_builder.write (f"Rain Probability:{weighted_rain_probability_result}\n"
-                                 f"Rain Coverage: {rain_coverage_result}\n"
+            string_builder.write (f"Rain Probability:{weighted_rain_probability_result}"
+                                 f"Rain Coverage: {rain_coverage_result}"
                                  f"Precipitation: {total_precipitation_result}")
             string_builder.write(self.build_rain_timeline(time_period_forecast))
         return string_builder.getvalue()
@@ -143,7 +154,7 @@ class Rain:
         total_precipitation = self.calculate_total_precipitation(time_period_forecast)
         rain_status =self.rain_status(time_period_forecast)
 
-        string_builder.write(f"\n= = = 🌦️ PRIOR RAINFALL REPORT 🌦️ = = =\n")
+        string_builder.write(f"\n= = = 🌦️ PRIOR RAINFALL 🌦️ = = =\n")
         if not (time_period_forecast):
             string_builder.write(f"{rain_status} RAIN (REPORT OMITTED)\n")
         else:
