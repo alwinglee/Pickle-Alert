@@ -105,9 +105,9 @@ class Wind:
         if (max_wind_speed <= self.WIND_SPEED_LOW):
             return (f"🟩 LOW (PREDICTIABLE PLAY)")
         elif (max_wind_speed <= self.WIND_SPEED_MODERATE):
-            return (f"🟨 MODERATE (VISIBLE BALL SWERVE)")
+            return (f"🟨 MODERATE (BALL SWERVE)")
         else:
-            return (f"🟥 HIGH (ERRATIC  MOVEMENT)")
+            return (f"🟥 HIGH (ERRATIC MOVEMENT)")
 
     def wind_gust_impact(self,max_wind_gust):
         """
@@ -120,9 +120,9 @@ class Wind:
         if (max_wind_gust <= self.WIND_GUST_LOW):
             return (f"🟩 LOW (PREDICTIABLE PLAY)")
         elif (max_wind_gust <= self.WIND_GUST_MODERATE):
-            return (f"🟨 MODERATE (VISIBLE BALL SWERVE)")
+            return (f"🟨 MODERATE (BALL SWERVE)")
         else:
-            return (f"🟥 HIGH (ERRATIC  MOVEMENT)")
+            return (f"🟥 HIGH (ERRATIC MOVEMENT)")
 
     def build_wind_timeline(self,time_period_forecast,metric):
         """
