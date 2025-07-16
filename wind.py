@@ -33,7 +33,7 @@ class Wind:
              "speed":round(each_hour["wind_kph"]), "gust":round(each_hour["gust_kph"])} for each_hour in hourly
         ]
         self.METRIC_LIST = list(timeline[0].keys())[1:]
-        return timeline[self.START_TIME:self.END_TIME+1]
+        return timeline[self.START_TIME:self.END_TIME]
 
     def find_max_wind_metric(self,time_period_forecast,metric):
         """
@@ -73,9 +73,9 @@ class Wind:
             max = self.find_max_wind_metric(time_period_forecast,metric)
             impact = self.select_impact_method(metric,max)
 
-            string_builder.write (f"\n= = = WIND {display_metric_title.upper()} REPORT = = =\n"
+            string_builder.write (f"\n= = = 🍃 WIND {display_metric_title.upper()} 🍃 = = =\n"
                                         f"Max. {max} kph | Avg. {average} kph \n")
-            string_builder.write(f"Impact: {impact}\n")
+            string_builder.write(f"{impact}\n")
             string_builder.write(self.build_wind_timeline(time_period_forecast,metric))
         return string_builder.getvalue()
 
@@ -103,11 +103,11 @@ class Wind:
         :return: A string describing the day's wind speed conditions, including the impact level.
         """
         if (max_wind_speed <= self.WIND_SPEED_LOW):
-            return (f"🟩 LOW (PREDICTIABLE MOVEMENT)")
+            return (f"🟩 LOW (PREDICTIABLE PLAY)")
         elif (max_wind_speed <= self.WIND_SPEED_MODERATE):
-            return (f"🟨 MODERATE (NOTICEABLE CURVE AND SPEED CHANGES)")
+            return (f"🟨 MODERATE (VISIBLE BALL SWERVE)")
         else:
-            return (f"🟥 HIGH (ERRATIC AND UNCONTROLLABLE)")
+            return (f"🟥 HIGH (ERRATIC  MOVEMENT)")
 
     def wind_gust_impact(self,max_wind_gust):
         """
@@ -118,11 +118,11 @@ class Wind:
         :return: A string describing the day's wind gust conditions, including the impact level.
         """
         if (max_wind_gust <= self.WIND_GUST_LOW):
-            return (f"🟩 LOW (MINOR UNPREDICTABILITY)")
+            return (f"🟩 LOW (PREDICTIABLE PLAY)")
         elif (max_wind_gust <= self.WIND_GUST_MODERATE):
-            return (f"🟨 MODERATE (NOTICEABLE BALL SWERVE)")
+            return (f"🟨 MODERATE (VISIBLE BALL SWERVE)")
         else:
-            return (f"🟥 HIGH (SEVERE DISRUPTION)")
+            return (f"🟥 HIGH (ERRATIC  MOVEMENT)")
 
     def build_wind_timeline(self,time_period_forecast,metric):
         """

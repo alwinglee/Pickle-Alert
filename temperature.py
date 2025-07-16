@@ -34,11 +34,11 @@ class Temperature:
         hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
         timeline = [
             {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
-             "apparent_temperature": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
+             "feels_like_temperature": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
              "uv_index": round(each_hour["uv"])} for each_hour in hourly
         ]
         self.METRIC_LIST = list(timeline[0].keys())[1:]
-        return timeline[self.START_TIME:self.END_TIME+1]
+        return timeline[self.START_TIME:self.END_TIME]
 
     def find_max_temperature_metric(self, time_period_forecast, metric):
         """
@@ -79,7 +79,7 @@ class Temperature:
             max = self.find_max_temperature_metric(time_period_forecast,metric)
             impact = self.select_impact_method(metric,max)
 
-            string_builder.write (f"\n- - - ☀️ {display_metric_title.upper()} REPORT ☀️ - - -\n")
+            string_builder.write (f"\n= = = ☀️ {display_metric_title.upper()} ☀️ = = =\n")
             if metric=="uv_index":
                 string_builder.write(f"Max. index {max}  | Avg. index {average}\n")
             elif metric=="humidity":
@@ -171,7 +171,7 @@ class Temperature:
         """
         string_builder = StringIO()
         display_metric_name= metric.replace("_"," ")
-        string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK {display_metric_name.upper()} HOURS - - -\n")
+        string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK {display_metric_name.upper()} HOURS - - \n")
         sort_by_max= sorted(time_period_forecast, key=lambda item:item[f"{metric}"],reverse=True)[:self.TOP_TIMELINE_COUNT]
         sort_by_time = sorted(sort_by_max,key=lambda item:item["time"])
         for each_hour in sort_by_time:
@@ -192,7 +192,7 @@ class Temperature:
 
         :return: String describing the impact level corresponding to the max value
         """
-        method = {"apparent_temperature": self.apparent_temperature_impact,
+        method = {"feels_like_temperature": self.apparent_temperature_impact,
                   "humidity":self.humidity_impact,
                   "uv_index":self.uv_index_impact}
         return method[metric](max)
