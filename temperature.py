@@ -2,6 +2,9 @@ from io import StringIO
 from datetime import datetime
 
 class Temperature:
+    """
+    A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports.
+    """
     def __init__(self,weather_data, START_TIME,END_TIME,TOP_TIMELINE_COUNT):
         self.weather_data=weather_data
         self.START_TIME=START_TIME
@@ -34,7 +37,7 @@ class Temperature:
         hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
         timeline = [
             {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
-             "feels_like_temperature": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
+             "feels_like": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
              "uv_index": round(each_hour["uv"])} for each_hour in hourly
         ]
         self.METRIC_LIST = list(timeline[0].keys())[1:]
@@ -192,7 +195,7 @@ class Temperature:
 
         :return: String describing the impact level corresponding to the max value
         """
-        method = {"feels_like_temperature": self.apparent_temperature_impact,
+        method = {"feels_like": self.apparent_temperature_impact,
                   "humidity":self.humidity_impact,
                   "uv_index":self.uv_index_impact}
         return method[metric](max)
