@@ -15,7 +15,6 @@ class Location:
         self.city = self.weather_data["location"]["name"]
         self.region = self.weather_data["location"]["region"]
         self.country=self.weather_data["location"]["country"]
-        self.current_data = self.weather_data["location"]["localtime"]
 
     def __str__(self):
         """
@@ -24,7 +23,7 @@ class Location:
         :return: A formatted string with city, region, and country comma-separated on one line,
         and local time on a new line.
         """
-        return (f"{self.city}, {self.region}, {self.country}\n"
-                f"{self.current_data}")
+        return (f"= = = LOCATION = = =\n"
+                f"{self.city}, {self.region}, {self.country}")
 
 
