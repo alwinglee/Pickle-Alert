@@ -4,7 +4,7 @@ class Rain:
     """
     A class to filter, analyze, and report rain-related weather data.
     """
-    def __init__(self,weather_data,START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR,total_hours):
+    def __init__(self,weather_data,START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR,total_hours,forecast_day):
         """
         Initializes the Rain class with key rain-related metrics from an API response and sets evaluation thresholds
         for rain impact levels.
@@ -13,24 +13,24 @@ class Rain:
 
         :return: None
         """
-        self.weather_data=weather_data
-        self.METRIC_LIST=[]
-        self.START_TIME=START_TIME
-        self.END_TIME=END_TIME
-        self.total_hours=total_hours
+        self.weather_data = weather_data
+        self.METRIC_LIST = []
+        self.START_TIME = START_TIME
+        self.END_TIME = END_TIME
+        self.total_hours = total_hours
         self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
-        self.RAIN_CHECK_HOURS_PRIOR=RAIN_CHECK_HOURS_PRIOR
-        self.PRE_RAIN_WINDOW_START= self.START_TIME - self.RAIN_CHECK_HOURS_PRIOR
-        self.RAIN_CHECK_HOURS_PRIOR=RAIN_CHECK_HOURS_PRIOR
-        self.RAIN_WEIGHTED_RAIN_PROBABILITY_LOW =30
+        self.RAIN_CHECK_HOURS_PRIOR = RAIN_CHECK_HOURS_PRIOR
+        self.PRE_RAIN_WINDOW_START = self.START_TIME - self.RAIN_CHECK_HOURS_PRIOR
+        self.RAIN_CHECK_HOURS_PRIOR = RAIN_CHECK_HOURS_PRIOR
+        self.forecast_day = forecast_day
+        self.RAIN_WEIGHTED_RAIN_PROBABILITY_LOW = 30
         self.RAIN_WEIGHTED_RAIN_PROBABILITY_MODERATE = 50
-        self.RAIN_PRECIPITATION_LOW=0.5
-        self.RAIN_PRECIPITATION_MODERATE=2.0
-        self.RAIN_COVERAGE_LOW= 30
-        self.RAIN_COVERAGE_MODERATE=60
-        self.LAST_HOUR_IMPACT_LOW=3
-        self.LAST_HOUR_IMPACT_MODERATE=2
-
+        self.RAIN_PRECIPITATION_LOW = 0.5
+        self.RAIN_PRECIPITATION_MODERATE = 2.0
+        self.RAIN_COVERAGE_LOW = 30
+        self.RAIN_COVERAGE_MODERATE = 60
+        self.LAST_HOUR_IMPACT_LOW = 3
+        self.LAST_HOUR_IMPACT_MODERATE = 2
 
     def convert_to_datetime(self,time):
         """
@@ -53,7 +53,7 @@ class Rain:
 
         :return: A time-sliced list of key rain metrics.
         """
-        hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
+        hourly = self.weather_data["forecast"]["forecastday"][self.forecast_day]["hour"]
         self.METRIC_LIST=[]
         timeline = []
 
