@@ -3,7 +3,7 @@ class Daylight:
     """
     Represents sunrise and sunset times for a location
     """
-    def __init__(self,weather_data, DAYS_TO_SHOW):
+    def __init__(self,weather_data, forecast_day):
         """
         Initializes Daylight with sunrise/sunset times extracted from weather API response.
 
@@ -11,7 +11,7 @@ class Daylight:
 
         :return: None
         """
-        self.DAYS_TO_SHOW = DAYS_TO_SHOW
+        self.forecast_day = forecast_day
         self.weather_data=weather_data
 
     def convert_to_military_time(self,time):
@@ -34,6 +34,6 @@ class Daylight:
 
         :return: A formatted string displaying sunrise and sunset times on separate lines.
         """
-        return (f"\nSunrise: {self.convert_to_military_time(self.retrieve_twilight_time(self.DAYS_TO_SHOW,"sunrise"))}\n"
-                f"Sunset: {self.convert_to_military_time(self.retrieve_twilight_time(self.DAYS_TO_SHOW,"sunset"))}")
+        return (f"\nSunrise: {self.convert_to_military_time(self.retrieve_twilight_time(self.forecast_day,"sunrise"))}\n"
+                f"Sunset: {self.convert_to_military_time(self.retrieve_twilight_time(self.forecast_day,"sunset"))}")
 
