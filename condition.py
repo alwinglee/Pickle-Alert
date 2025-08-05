@@ -3,12 +3,13 @@ class Condition:
     """
     A class that processes weather data, evaluates the condition and generates a report.
     """
-    def __init__(self,weather_data, START_TIME, END_TIME,TOP_TIMELINE_COUNT):
-        self.weather_data= weather_data
-        self.START_TIME=START_TIME
-        self.END_TIME=END_TIME
-        self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
-        self.METRIC_LIST=[]
+    def __init__(self,weather_data, START_TIME, END_TIME,TOP_TIMELINE_COUNT,DAYS_TO_SHOW):
+        self.weather_data = weather_data
+        self.START_TIME = START_TIME
+        self.END_TIME = END_TIME
+        self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
+        self.METRIC_LIST = []
+        self.DAYS_TO_SHOW = DAYS_TO_SHOW
 
     def filter_condition_metrics(self):
         """
@@ -18,7 +19,7 @@ class Condition:
 
         :return: A time-sliced list containing hourly condition texts and codes.
         """
-        hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
+        hourly = self.weather_data["forecast"]["forecastday"][self.DAYS_TO_SHOW]["hour"]
         timeline = [
             {"condition_text": each_hour["condition"]["text"], "condition_code": each_hour["condition"]["code"]} for each_hour in hourly
         ]
