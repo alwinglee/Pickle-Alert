@@ -10,7 +10,7 @@ from date import Date
 # from sms import Sms
 
 # Number of forecast days (Max 3 due to API free tier limits)
-FORECAST_DAYS = 3
+MAX_FORECAST_DAYS = 3
 # First hour to include in analysis (24- hour format).For single-digit hours, omit the leading zero
 # Use 9 for 9 AM, 22 for 10 PM, and 24 for midnight (current day, not next day)
 # Example: 16-20 includes hours 16, 17, 18, and 19 (excludes 20)
@@ -46,15 +46,15 @@ def main():
         if not (1 <= DAYS_TO_SHOW <= 3):
             raise Exception(f"DAYS_TO_SHOW must be 1 (today) or up to 3 (today + 2 days)")
 
-        weather_data= WeatherAPI.fetch_weather_forecast(FORECAST_DAYS)
-        for each_day in range(DAYS_TO_SHOW):
+        weather_data= WeatherAPI.fetch_weather_forecast(MAX_FORECAST_DAYS)
+        for forecast_day in range(DAYS_TO_SHOW):
             location_details = Location(weather_data)
-            date_details = Date(weather_data,START_TIME,END_TIME,total_hours, each_day)
-            daylight_details = Daylight(weather_data, each_day)
-            condition_details = Condition(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT, each_day)
-            rain_details = Rain(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR,total_hours, each_day)
-            wind_details = Wind(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT,each_day)
-            temperature_details = Temperature(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT,each_day)
+            date_details = Date(weather_data,START_TIME,END_TIME, total_hours, forecast_day)
+            daylight_details = Daylight(weather_data,forecast_day)
+            condition_details = Condition(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT, forecast_day)
+            rain_details = Rain(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR,total_hours, forecast_day)
+            wind_details = Wind(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT,forecast_day)
+            temperature_details = Temperature(weather_data, START_TIME, END_TIME, TOP_TIMELINE_COUNT,forecast_day)
             report_details = Report(location_details, daylight_details, rain_details, wind_details, temperature_details, condition_details, date_details,  START_TIME, END_TIME, total_hours)
             # Sms(report_details,date_details)
     except TypeError:
