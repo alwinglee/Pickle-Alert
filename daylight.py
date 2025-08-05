@@ -3,7 +3,7 @@ class Daylight:
     """
     Represents sunrise and sunset times for a location
     """
-    def __init__(self,weather_data):
+    def __init__(self,weather_data, DAYS_TO_SHOW):
         """
         Initializes Daylight with sunrise/sunset times extracted from weather API response.
 
@@ -11,8 +11,8 @@ class Daylight:
 
         :return: None
         """
-        self.sunrise = weather_data["forecast"]["forecastday"][0]["astro"]["sunrise"]
-        self.sunset = weather_data["forecast"]["forecastday"][0]["astro"]["sunset"]
+        self.DAYS_TO_SHOW = DAYS_TO_SHOW
+        self.weather_data=weather_data
 
     def convert_to_military_time(self,time):
         """
@@ -24,12 +24,16 @@ class Daylight:
         """
         return datetime.strptime(time,"%I:%M %p").strftime("%H:%M")
 
+    def retrieve_twilight_time(self,days,metric):
+        return self.weather_data["forecast"]["forecastday"][days]["astro"][metric]
+
+
     def __str__(self):
         """
         Overrides the default '__str__' method to return sunrise/sunset in another format.
 
         :return: A formatted string displaying sunrise and sunset times on separate lines.
         """
-        return (f"Sunrise: {self.convert_to_military_time(self.sunrise)}\n"
-                f"Sunset: {self.convert_to_military_time(self.sunset)}")
+        return (f"\nSunrise: {self.convert_to_military_time(self.retrieve_twilight_time(self.DAYS_TO_SHOW,"sunrise"))}\n"
+                f"Sunset: {self.convert_to_military_time(self.retrieve_twilight_time(self.DAYS_TO_SHOW,"sunset"))}")
 
