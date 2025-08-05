@@ -1,4 +1,4 @@
-
+from datetime import datetime
 class Location:
     """
     Represents the geographical location (city, region, country) and local time for specific coordinates.
@@ -11,10 +11,10 @@ class Location:
 
         :return: None
         """
-        self.weather_data=weather_data
-        self.city = self.weather_data["location"]["name"]
-        self.region = self.weather_data["location"]["region"]
-        self.country=self.weather_data["location"]["country"]
+        self.weather_data = weather_data
+
+    def retrieve_location_details(self, metric):
+        return self.weather_data["location"][metric]
 
     def __str__(self):
         """
@@ -24,6 +24,8 @@ class Location:
         and local time on a new line.
         """
         return (f"= = = LOCATION = = =\n"
-                f"{self.city}, {self.region}, {self.country}")
+                f"{self.retrieve_location_details("name")}, {self.retrieve_location_details("region")}, "
+                f"{self.retrieve_location_details("country")}")
+
 
 
