@@ -5,16 +5,17 @@ class Temperature:
     """
     A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports.
     """
-    def __init__(self,weather_data, START_TIME,END_TIME,TOP_TIMELINE_COUNT):
+    def __init__(self,weather_data, START_TIME,END_TIME,TOP_TIMELINE_COUNT,forecast_day):
         self.weather_data=weather_data
         self.START_TIME=START_TIME
         self.END_TIME=END_TIME
-        self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
+        self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
         self.METRIC_LIST = []
+        self.forecast_day = forecast_day
         self.APPARENT_TEMPERATURE_LOW = 24
         self.APPARENT_TEMPERATURE_MODERATE = 33
         self.UV_INDEX_LOW = 2
-        self.UV_INDEX_MODERATE= 5
+        self.UV_INDEX_MODERATE = 5
         self.UV_INDEX_HIGH = 7
         self.UV_INDEX_VERY_HIGH = 10
         self.HEAT_INDEX_LOW = 25
@@ -34,7 +35,7 @@ class Temperature:
 
         :return: A time-sliced list of key temperature metrics.
         """
-        hourly = self.weather_data["forecast"]["forecastday"][0]["hour"]
+        hourly = self.weather_data["forecast"]["forecastday"][self.forecast_day]["hour"]
         timeline = [
             {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
              "feels_like": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
