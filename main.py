@@ -7,7 +7,6 @@ from report import Report
 from temperature import Temperature
 from condition import Condition
 from date import Date
-from alert import Alert
 # from sms import Sms
 
 # Number of forecast days (Max 3 due to API free tier limits)
@@ -24,7 +23,7 @@ END_TIME = 24
 TOP_TIMELINE_COUNT = 8
 # Specifies how many hours before the start time to check for rain (used in Rain class)
 RAIN_CHECK_HOURS_PRIOR = 4
-# Show Up To Which Days. (E.g. 1 = current day, 2= current day + Next day, 3 = current day + next two days)
+# Show Up To Which Days (E.g. 1 = current day, 2= current day + Next day, 3 = current day + next two days)
 DAYS_TO_SHOW = 1
 
 def main():
@@ -36,14 +35,16 @@ def main():
     """
     try:
         if not (0 <= START_TIME <= 23) or not (1 <= END_TIME <= 24):
-            raise Exception("Invalid time format. Hours must be START_TIME (0-23) and END_TIME (1-23).")
+            raise Exception("Invalid time format. Hours must be START_TIME (0-23) and END_TIME (1-23)")
         if END_TIME <=START_TIME:
-            raise Exception("END TIME MUST BE AFTER START TIME")
+            raise Exception("End Time Must Be After Start Time")
         total_hours = END_TIME-START_TIME
         if (total_hours <TOP_TIMELINE_COUNT):
-            raise Exception(f"Max. count exceeds time range (set to ≤ {total_hours} hours).")
+            raise Exception(f"Max. count exceeds time range (set to ≤ {total_hours} hours)")
         if (RAIN_CHECK_HOURS_PRIOR>START_TIME or START_TIME - RAIN_CHECK_HOURS_PRIOR<0):
-            raise Exception(f"The rain check period must be within the same day and must not exceed the start time.")
+            raise Exception(f"The rain check period must be within the same day and must not exceed the start time")
+        if not (1 <= DAYS_TO_SHOW <= 3):
+            raise Exception(f"DAYS_TO_SHOW must be 1 (today) or up to 3 (today + 2 days)")
 
         weather_data= WeatherAPI.fetch_weather_forecast(FORECAST_DAYS)
         for each_day in range(DAYS_TO_SHOW):
