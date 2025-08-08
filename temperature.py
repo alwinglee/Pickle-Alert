@@ -5,15 +5,12 @@ class Temperature:
     """
     A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports.
     """
-    def __init__(self,weather_data, START_TIME,END_TIME,TOP_TIMELINE_COUNT,forecast_day):
-        self.weather_data=weather_data
-        self.START_TIME=START_TIME
-        self.END_TIME=END_TIME
+    def __init__(self,TOP_TIMELINE_COUNT,hourly_selected_forecast_data):
         self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
+        self.hourly_selected_forecast_data = hourly_selected_forecast_data
         self.METRIC_LIST = []
-        self.forecast_day = forecast_day
-        self.APPARENT_TEMPERATURE_LOW = 24
-        self.APPARENT_TEMPERATURE_MODERATE = 33
+        self.FEELS_LIKE_LOW = 24
+        self.FEELS_LIKE_MODERATE = 33
         self.UV_INDEX_LOW = 2
         self.UV_INDEX_MODERATE = 5
         self.UV_INDEX_HIGH = 7
@@ -30,26 +27,25 @@ class Temperature:
 
         Each entry contains the following key-value pairs:
             - Time
-            - Apparent Temperature
+            - feels like
             - Uv Index
 
         :return: A time-sliced list of key temperature metrics.
         """
-        hourly = self.weather_data["forecast"]["forecastday"][self.forecast_day]["hour"]
         timeline = [
             {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
              "feels_like": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
-             "uv_index": round(each_hour["uv"])} for each_hour in hourly
+             "uv_index": round(each_hour["uv"])} for each_hour in self.hourly_selected_forecast_data
         ]
         self.METRIC_LIST = list(timeline[0].keys())[1:]
-        return timeline[self.START_TIME:self.END_TIME]
+        return timeline
 
     def find_max_temperature_metric(self, time_period_forecast, metric):
         """
         Identifies the highest temperature metric from the forecast data list.
 
         :param time_period_forecast: List of rain data by time slice
-        :param metric: String parameter representing the metric keyword (ex. "apparent temperature" or "UV index")
+        :param metric: String parameter representing the metric keyword (ex. "feels like" or "UV index")
 
         :return: Integer value of the highest recorded value for the specified metric in the forecast data.
         """
@@ -61,7 +57,7 @@ class Temperature:
         Calculates the average temperature metric value from forecast data.
 
         :param time_period_forecast: List of wind data by time interval.
-        :param metric: String representing the temperature metric to average (e.g., "apparent temperature" or "UV index").
+        :param metric: String representing the temperature metric to average (e.g., "feels like" or "UV index").
 
         :return: Integer value of the average for the specified temperature metric.
         """
@@ -109,17 +105,17 @@ class Temperature:
             string_builder.write(f"{display_metric_title}: {impact}\n")
         return string_builder.getvalue()
 
-    def apparent_temperature_impact(self, max_apparent_temperature):
+    def feels_like_impact(self, max_feels_like):
         """
-        Generates a summary of the apparent temperature conditions for the day, including impact assessments.
+        Generates a summary of the feels like conditions for the day, including impact assessments.
 
-        :param max_apparent_temperature: An integer representing the highest apparent temperature in the forecast data.
+        :param max_feels_like: An integer representing the highest feels like in the forecast data.
 
-        :return: A string describing the day's apparent temperature conditions, including the impact level.
+        :return: A string describing the day's feels like conditions, including the impact level.
         """
-        if (max_apparent_temperature<= self.APPARENT_TEMPERATURE_LOW):
+        if (max_feels_like<= self.FEELS_LIKE_LOW):
             return (f"🟩 LOW (COMFORTABLE)")
-        elif (max_apparent_temperature <= self.APPARENT_TEMPERATURE_MODERATE):
+        elif (max_feels_like <= self.FEELS_LIKE_MODERATE):
             return (f"🟨 MODERATE (HEAT FATIGUE)")
         else:
             return (f"🟥 HIGH (DANGEROUS HEAT)")
@@ -166,10 +162,10 @@ class Temperature:
 
         Each entry includes:
         - Time (in `HH:MM` format)
-        - Apparent Temperature (°C) or UV Index (index.)
+        - feels like (°C) or UV Index (index.)
 
         :param time_period_forecast: List of wind data points by time interval
-        :param metric: Key indicating which wind metric to display ("apparent_temperature","heat_index", or "uv_index")
+        :param metric: Key indicating which wind metric to display ("feels_like","heat_index", or "uv_index")
 
         :return: Formatted string showing chronological timeline entries for the specified metric
         """
@@ -191,12 +187,12 @@ class Temperature:
         """
         Selects the appropriate impact method based on the given parameters.
 
-        :param metric: Key indicating which temperature metric to display ("apparent temperature", "humidity", or "uv index")
+        :param metric: Key indicating which temperature metric to display ("feels like", "humidity", or "uv index")
         :param max: Maximum value (integer) found in the metric dataset
 
         :return: String describing the impact level corresponding to the max value
         """
-        method = {"feels_like": self.apparent_temperature_impact,
+        method = {"feels_like": self.feels_like_impact,
                   "humidity":self.humidity_impact,
                   "uv_index":self.uv_index_impact}
         return method[metric](max)
