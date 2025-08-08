@@ -11,7 +11,7 @@ class WeatherAPI:
         Sends a request to the API server with specific parameters to retrieve the weather forecast for the current day
         and the next two days.
 
-        :param FORECAST_DAYS: Number of days to include in forecast
+        :param MAX_FORECAST_DAYS: Number of days to include in forecast
 
         :return: The API's weather forecast response in JSON format.
         """
