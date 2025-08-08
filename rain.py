@@ -4,7 +4,7 @@ class Rain:
     """
     A class to filter, analyze, and report rain-related weather data.
     """
-    def __init__(self,weather_data,START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR,total_hours,forecast_day):
+    def __init__(self,START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR, forecast_data):
         """
         Initializes the Rain class with key rain-related metrics from an API response and sets evaluation thresholds
         for rain impact levels.
@@ -13,16 +13,15 @@ class Rain:
 
         :return: None
         """
-        self.weather_data = weather_data
-        self.METRIC_LIST = []
+
         self.START_TIME = START_TIME
         self.END_TIME = END_TIME
-        self.total_hours = total_hours
+        self.duration = END_TIME-START_TIME
         self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
         self.RAIN_CHECK_HOURS_PRIOR = RAIN_CHECK_HOURS_PRIOR
         self.PRE_RAIN_WINDOW_START = self.START_TIME - self.RAIN_CHECK_HOURS_PRIOR
         self.RAIN_CHECK_HOURS_PRIOR = RAIN_CHECK_HOURS_PRIOR
-        self.forecast_day = forecast_day
+        self.forecast_data= forecast_data
         self.RAIN_WEIGHTED_RAIN_PROBABILITY_LOW = 30
         self.RAIN_WEIGHTED_RAIN_PROBABILITY_MODERATE = 50
         self.RAIN_PRECIPITATION_LOW = 0.5
@@ -53,28 +52,21 @@ class Rain:
 
         :return: A time-sliced list of key rain metrics.
         """
-        hourly = self.weather_data["forecast"]["forecastday"][self.forecast_day]["hour"]
-        self.METRIC_LIST=[]
         timeline = []
 
         start_time_datetime = self.convert_to_datetime(START_TIME)
         end_time_datetime=self.convert_to_datetime(END_TIME)
 
-        for each_hour in hourly:
+        for each_hour in self.forecast_data["hour"]:
             time_datetime_conversion =  datetime.strptime(each_hour["time"],"%Y-%m-%d %H:%M").time()
 
             # Only includes hours where rain is expected (API uses 1 = Yes)
             if (start_time_datetime<=time_datetime_conversion <= end_time_datetime) and each_hour["will_it_rain"]==1:
                 timeline.append({
                     "time": time_datetime_conversion.strftime("%H:%M"),
-                    "cloud_percentage": each_hour["cloud"],
                     "rain_percentage":each_hour["chance_of_rain"],
                     "rain_amount":each_hour["precip_mm"],
                 })
-        if (timeline):
-            temp_list= [ each_key for each_key in timeline[0].keys()][2:]
-            for each_key in temp_list:
-                self.METRIC_LIST.append(each_key)
         return timeline
 
     def calculate_rain_coverage_percentage(self, time_period_forecast):
@@ -85,7 +77,7 @@ class Rain:
 
         :return: Integer percentage of hours with expected rain during the period.
         """
-        return round(((len(time_period_forecast)/self.total_hours)*100))
+        return round(((len(time_period_forecast)/self.duration)*100))
 
     def calculate_weighted_rain_probability(self,time_period_forecast):
         """
@@ -98,7 +90,7 @@ class Rain:
         rain_percentage=0
         for each_hour in time_period_forecast:
             rain_percentage+=each_hour["rain_percentage"]
-        return round(rain_percentage/self.total_hours)
+        return round(rain_percentage/self.duration)
 
     def calculate_total_precipitation(self, time_period_forecast):
         """
@@ -135,7 +127,7 @@ class Rain:
             total_precipitation_result=self.total_precipitation_impact(total_precipitation)
             number_of_hour_of_rain = len(time_period_forecast)
 
-            string_builder.write(f"Rain {number_of_hour_of_rain}/{self.total_hours} hours ({rain_coverage_percentage}%)"
+            string_builder.write(f"Rain {number_of_hour_of_rain}/{self.duration} hours ({rain_coverage_percentage}%)"
                                  f"| Avg. Chance: {weighted_rain_probability}% | {total_precipitation} mm\n")
             string_builder.write (f"Rain Probability:{weighted_rain_probability_result}"
                                  f"Rain Coverage: {rain_coverage_result}"
