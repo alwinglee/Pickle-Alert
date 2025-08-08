@@ -5,13 +5,10 @@ class Wind:
     """
     A class that processes weather data, evaluates wind impact (both speed and gusts), and generates actionable reports
     """
-    def __init__(self,weather_data,START_TIME,END_TIME,TOP_TIMELINE_COUNT,forecast_day):
+    def __init__(self,TOP_TIMELINE_COUNT, hourly_selected_forecast_data):
         self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
-        self.weather_data=weather_data
+        self.hourly_selected_forecast_data = hourly_selected_forecast_data
         self.METRIC_LIST=[]
-        self.START_TIME=START_TIME
-        self.END_TIME=END_TIME
-        self.forecast_day=forecast_day
         self.WIND_SPEED_LOW = 15
         self.WIND_SPEED_MODERATE = 25
         self.WIND_GUST_LOW = 20
@@ -28,13 +25,12 @@ class Wind:
 
         :return: A time-sliced list of key wind metrics.
         """
-        hourly = self.weather_data["forecast"]["forecastday"][self.forecast_day]["hour"]
         timeline = [
             {"time":datetime.strptime(each_hour["time"],("%Y-%m-%d %H:%M")).strftime("%H:%M"),
-             "speed":round(each_hour["wind_kph"]), "gust":round(each_hour["gust_kph"])} for each_hour in hourly
+             "speed":round(each_hour["wind_kph"]), "gust":round(each_hour["gust_kph"])} for each_hour in self.hourly_selected_forecast_data
         ]
         self.METRIC_LIST = list(timeline[0].keys())[1:]
-        return timeline[self.START_TIME:self.END_TIME]
+        return timeline
 
     def find_max_wind_metric(self,time_period_forecast,metric):
         """
