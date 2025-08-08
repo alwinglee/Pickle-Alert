@@ -2,23 +2,23 @@ import requests
 import os
 from dotenv import load_dotenv
 
-class WeatherAPI:
+class Weather_API:
     """
     A class to interact with a weather API and fetch forecast data.
     """
-    def fetch_weather_forecast(MAX_FORECAST_DAYS):
+    def fetch_weather_forecast(DAYS_TO_SHOW):
         """
         Sends a request to the API server with specific parameters to retrieve the weather forecast for the current day
         and the next two days.
 
-        :param MAX_FORECAST_DAYS: Number of days to include in forecast
+        :param DAYS_TO_SHOW: Number of days to include in forecast
 
         :return: The API's weather forecast response in JSON format.
         """
         try:
             load_dotenv()
             weather_response = requests.get(os.getenv("URL"), params={"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
-                                                                      "key": os.getenv("API_KEY"), "days": MAX_FORECAST_DAYS})
+                                                                      "key": os.getenv("API_KEY"), "days": DAYS_TO_SHOW})
             weather_response.raise_for_status()
             weather_response_json= weather_response.json()
         except requests.exceptions.ConnectionError:
