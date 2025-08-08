@@ -3,7 +3,7 @@ class Location:
     """
     Represents the geographical location (city, region, country) and local time for specific coordinates.
     """
-    def __init__(self,weather_data):
+    def __init__(self,forecast_location_data):
         """
         Initializes Location with geographic details and local time extracted from weather API response.
 
@@ -11,10 +11,10 @@ class Location:
 
         :return: None
         """
-        self.weather_data = weather_data
+        self.forecast_location_data = forecast_location_data
 
     def retrieve_location_details(self, metric):
-        return self.weather_data["location"][metric]
+        return self.forecast_location_data[metric]
 
     def __str__(self):
         """
