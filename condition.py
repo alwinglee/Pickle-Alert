@@ -3,13 +3,8 @@ class Condition:
     """
     A class that processes weather data, evaluates the condition and generates a report.
     """
-    def __init__(self,weather_data, START_TIME, END_TIME,TOP_TIMELINE_COUNT,forecast_day):
-        self.weather_data = weather_data
-        self.START_TIME = START_TIME
-        self.END_TIME = END_TIME
-        self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
-        self.METRIC_LIST = []
-        self.forecast_day = forecast_day
+    def __init__(self,hourly_selected_forecast_data):
+        self.hourly_selected_forecast_data = hourly_selected_forecast_data
 
     def filter_condition_metrics(self):
         """
@@ -19,12 +14,10 @@ class Condition:
 
         :return: A time-sliced list containing hourly condition texts and codes.
         """
-        hourly = self.weather_data["forecast"]["forecastday"][self.forecast_day]["hour"]
         timeline = [
-            {"condition_text": each_hour["condition"]["text"], "condition_code": each_hour["condition"]["code"]} for each_hour in hourly
-        ]
-        self.METRIC_LIST = list(timeline[0].keys())[1:]
-        return (timeline[self.START_TIME:self.END_TIME])
+            {"condition_text": each_hour["condition"]["text"], "condition_code": each_hour["condition"]["code"]}
+            for each_hour in self.hourly_selected_forecast_data]
+        return timeline
 
     def find_condition_mode(self):
         """
@@ -34,8 +27,8 @@ class Condition:
         """
         time_period_forecast = self.filter_condition_metrics()
         condition_list= [each_hour["condition_text"] for each_hour in time_period_forecast]
-        most_common_condition= mode(condition_list)
-        return (most_common_condition)
+        dominant_condition= mode(condition_list)
+        return (dominant_condition)
 
     def condition_summary(self):
         """
