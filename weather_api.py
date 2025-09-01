@@ -18,7 +18,8 @@ class Weather_API:
         try:
             load_dotenv()
             weather_response = requests.get(os.getenv("URL"), params={"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
-                                                                      "key": os.getenv("API_KEY"), "days": DAYS_TO_SHOW})
+                                                                      "key": os.getenv("API_KEY"), "days": DAYS_TO_SHOW,
+                                                                      "alerts":"yes"})
             weather_response.raise_for_status()
             weather_response_json= weather_response.json()
         except requests.exceptions.ConnectionError:
