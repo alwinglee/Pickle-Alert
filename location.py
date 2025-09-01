@@ -23,8 +23,7 @@ class Location:
         :return: A formatted string with city, region, and country comma-separated on one line,
         and local time on a new line.
         """
-        return (f"= = = LOCATION = = =\n"
-                f"{self.retrieve_location_details("name")}, {self.retrieve_location_details("region")}, "
+        return (f"{self.retrieve_location_details("name")}, {self.retrieve_location_details("region")}, "
                 f"{self.retrieve_location_details("country")}")
 
 
