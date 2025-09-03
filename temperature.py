@@ -5,21 +5,22 @@ class Temperature:
     """
     A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports.
     """
+    FEELS_LIKE_LOW = 24
+    FEELS_LIKE_MODERATE = 33
+    UV_INDEX_LOW = 2
+    UV_INDEX_MODERATE = 5
+    UV_INDEX_HIGH = 7
+    UV_INDEX_VERY_HIGH = 10
+    HEAT_INDEX_LOW = 25
+    HEAT_INDEX_MODERATE = 33
+    HUMIDITY_LOW = 30
+    HUMIDITY_MODERATE = 60
+    HUMIDITY_HIGH = 75
+
     def __init__(self,top_timeline_count,hourly_selected_forecast_data):
         self.top_timeline_count = top_timeline_count
         self.hourly_selected_forecast_data = hourly_selected_forecast_data
         self.METRIC_LIST = []
-        self.FEELS_LIKE_LOW = 24
-        self.FEELS_LIKE_MODERATE = 33
-        self.UV_INDEX_LOW = 2
-        self.UV_INDEX_MODERATE = 5
-        self.UV_INDEX_HIGH = 7
-        self.UV_INDEX_VERY_HIGH = 10
-        self.HEAT_INDEX_LOW = 25
-        self.HEAT_INDEX_MODERATE = 33
-        self.HUMIDITY_LOW = 30
-        self.HUMIDITY_MODERATE = 60
-        self.HUMIDITY_HIGH = 75
 
     def filter_temperature_metrics(self):
         """
