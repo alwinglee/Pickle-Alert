@@ -5,14 +5,14 @@ class Wind:
     """
     A class that processes weather data, evaluates wind impact (both speed and gusts), and generates actionable reports
     """
+    WIND_SPEED_LOW = 15
+    WIND_SPEED_MODERATE = 25
+    WIND_GUST_LOW = 20
+    WIND_GUST_MODERATE = 35
     def __init__(self,top_timeline_count, hourly_selected_forecast_data):
         self.top_timeline_count=top_timeline_count
         self.hourly_selected_forecast_data = hourly_selected_forecast_data
         self.METRIC_LIST=[]
-        self.WIND_SPEED_LOW = 15
-        self.WIND_SPEED_MODERATE = 25
-        self.WIND_GUST_LOW = 20
-        self.WIND_GUST_MODERATE = 35
 
     def filter_wind_metrics(self):
         """
