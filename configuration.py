@@ -3,13 +3,13 @@ class Configuration:
     """
     Stores weather configuration parameters and passes them to the Configuration_Validator class for validation
     """
-    def __init__(self, START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR, DAYS_TO_SHOW):
-        self.START_TIME=START_TIME
-        self.END_TIME=END_TIME
-        self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
-        self.RAIN_CHECK_HOURS_PRIOR=RAIN_CHECK_HOURS_PRIOR
-        self.DAYS_TO_SHOW=DAYS_TO_SHOW
-        self.duration = self.END_TIME - self.START_TIME
+    def __init__(self, start_time, end_time, top_timeline_count, rain_check_hours_prior, days_to_show):
+        self.start_time=start_time
+        self.end_time=end_time
+        self.top_timeline_count=top_timeline_count
+        self.rain_check_hours_prior=rain_check_hours_prior
+        self.days_to_show=days_to_show
+        self.duration = self.end_time - self.start_time
         self.activateValidation()
     def activateValidation(self):
         """
@@ -17,7 +17,7 @@ class Configuration:
 
         :exception: An error message will be displayed when validation conditions are not met
         """
-        Configuration_Validator.validate_forecast_days(self.DAYS_TO_SHOW)
-        Configuration_Validator.validate_time_range(self.START_TIME,self.END_TIME)
-        Configuration_Validator.validate_timeline_fits_range(self.duration,self.TOP_TIMELINE_COUNT)
-        Configuration_Validator.validate_rain_check_window(self.RAIN_CHECK_HOURS_PRIOR,self.START_TIME)
+        Configuration_Validator.validate_forecast_days(self.days_to_show)
+        Configuration_Validator.validate_time_range(self.start_time,self.end_time)
+        Configuration_Validator.validate_timeline_fits_range(self.duration,self.top_timeline_count)
+        Configuration_Validator.validate_rain_check_window(self.rain_check_hours_prior,self.start_time)
