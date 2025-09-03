@@ -6,19 +6,19 @@ class Weather_API:
     """
     A class to interact with a weather API and fetch forecast data.
     """
-    def fetch_weather_forecast(DAYS_TO_SHOW):
+    def fetch_weather_forecast(days_to_show):
         """
         Sends a request to the API server with specific parameters to retrieve the weather forecast for the current day
         and the next two days.
 
-        :param DAYS_TO_SHOW: Number of days to include in forecast
+        :param days_to_show: Number of days to include in forecast
 
         :return: The API's weather forecast response in JSON format.
         """
         try:
             load_dotenv()
             weather_response = requests.get(os.getenv("URL"), params={"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
-                                                                      "key": os.getenv("API_KEY"), "days": DAYS_TO_SHOW,
+                                                                      "key": os.getenv("API_KEY"), "days": days_to_show,
                                                                       "alerts":"yes"})
             weather_response.raise_for_status()
             weather_response_json= weather_response.json()
