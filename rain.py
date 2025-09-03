@@ -4,36 +4,28 @@ class Rain:
     """
     A class to filter, analyze, and report rain-related weather data.
     """
-    def __init__(self,START_TIME, END_TIME, TOP_TIMELINE_COUNT, RAIN_CHECK_HOURS_PRIOR, forecast_data):
-        """
-        Initializes the Rain class with key rain-related metrics from an API response and sets evaluation thresholds
-        for rain impact levels.
+    RAIN_WEIGHTED_RAIN_PROBABILITY_LOW = 30
+    RAIN_WEIGHTED_RAIN_PROBABILITY_MODERATE = 50
+    RAIN_PRECIPITATION_LOW = 0.5
+    RAIN_PRECIPITATION_MODERATE = 2.0
+    RAIN_COVERAGE_LOW = 30
+    RAIN_COVERAGE_MODERATE = 60
+    LAST_HOUR_IMPACT_LOW = 3
+    LAST_HOUR_IMPACT_MODERATE = 2
 
-        :param weather_data: Weather forecast response in JSON format.
-
-        :return: None
-        """
-
-        self.START_TIME = START_TIME
-        self.END_TIME = END_TIME
-        self.duration = END_TIME-START_TIME
-        self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
-        self.RAIN_CHECK_HOURS_PRIOR = RAIN_CHECK_HOURS_PRIOR
-        self.PRE_RAIN_WINDOW_START = self.START_TIME - self.RAIN_CHECK_HOURS_PRIOR
-        self.RAIN_CHECK_HOURS_PRIOR = RAIN_CHECK_HOURS_PRIOR
+    def __init__(self,start_time, end_time, top_timeline_count, rain_check_hours_prior, forecast_data):
+        self.start_time = start_time
+        self.end_time = end_time
+        self.duration = end_time-start_time
+        self.top_timeline_count = top_timeline_count
+        self.rain_check_hours_prior = rain_check_hours_prior
+        self.pre_rain_window_start = self.start_time - self.rain_check_hours_prior
+        self.rain_check_hours_prior = rain_check_hours_prior
         self.forecast_data= forecast_data
-        self.RAIN_WEIGHTED_RAIN_PROBABILITY_LOW = 30
-        self.RAIN_WEIGHTED_RAIN_PROBABILITY_MODERATE = 50
-        self.RAIN_PRECIPITATION_LOW = 0.5
-        self.RAIN_PRECIPITATION_MODERATE = 2.0
-        self.RAIN_COVERAGE_LOW = 30
-        self.RAIN_COVERAGE_MODERATE = 60
-        self.LAST_HOUR_IMPACT_LOW = 3
-        self.LAST_HOUR_IMPACT_MODERATE = 2
 
     def convert_to_datetime(self,time):
         """
-        Converts an integer time value (START_TIME or END_TIME) to a datetime object.
+        Converts an integer time value (start_time or end_time) to a datetime object.
 
         :param time: An integer representing either the start time or end time in hours (24-hour format)
 
@@ -41,7 +33,7 @@ class Rain:
         """
         return datetime.strptime("23:59" if time == 24 else f"{time:02d}:00", "%H:%M").time()
 
-    def filter_rain_metric(self,START_TIME,END_TIME):
+    def filter_rain_metric(self,start_time,end_time):
         """
         Generates an hourly list within a specified time period and extracts key rain metrics
 
@@ -54,8 +46,8 @@ class Rain:
         """
         timeline = []
 
-        start_time_datetime = self.convert_to_datetime(START_TIME)
-        end_time_datetime=self.convert_to_datetime(END_TIME)
+        start_time_datetime = self.convert_to_datetime(start_time)
+        end_time_datetime=self.convert_to_datetime(end_time)
 
         for each_hour in self.forecast_data["hour"]:
             time_datetime_conversion =  datetime.strptime(each_hour["time"],"%Y-%m-%d %H:%M").time()
@@ -112,7 +104,7 @@ class Rain:
         :return: A string containing the full report, structured with headers, metrics, and impact descriptions.
         """
         string_builder = StringIO()
-        time_period_forecast = self.filter_rain_metric(self.START_TIME, self.END_TIME)
+        time_period_forecast = self.filter_rain_metric(self.start_time, self.end_time)
         rain_status = self.rain_status(time_period_forecast)
         string_builder.write(f"\n= = = 🌦️ RAIN 🌦️ = = =\n")
         if not time_period_forecast:
@@ -142,7 +134,7 @@ class Rain:
         :return: A string containing the full report, structured with headers, metrics, and impact descriptions.
         """
         string_builder = StringIO()
-        time_period_forecast = self.filter_rain_metric(self.PRE_RAIN_WINDOW_START, self.START_TIME)
+        time_period_forecast = self.filter_rain_metric(self.pre_rain_window_start, self.start_time)
         total_precipitation = self.calculate_total_precipitation(time_period_forecast)
         rain_status =self.rain_status(time_period_forecast)
 
@@ -152,7 +144,7 @@ class Rain:
         else:
             last_rain_hour = (time_period_forecast[-1]["time"])
             impact= self.assess_pre_window_impact(last_rain_hour)
-            string_builder.write(f"Rained {len(time_period_forecast)}/{self.RAIN_CHECK_HOURS_PRIOR} last hours (Last {last_rain_hour}) | "
+            string_builder.write(f"Rained {len(time_period_forecast)}/{self.rain_check_hours_prior} last hours (Last {last_rain_hour}) | "
                                  f"{total_precipitation} mm\n")
             string_builder.write(f"{impact}\n")
             string_builder.write(self.build_rain_timeline(time_period_forecast))
@@ -169,7 +161,7 @@ class Rain:
         """
         last_hour_datetime_conversion = datetime.strptime(f"{last_rain_hour}", "%H:%M").time()
         
-        datetime_difference= datetime.combine(datetime.today(), self.START_TIME_DATETIME) - datetime.combine(datetime.today(),last_hour_datetime_conversion)
+        datetime_difference= datetime.combine(datetime.today(), self.convert_to_datetime(self.start_time)) - datetime.combine(datetime.today(),last_hour_datetime_conversion)
         rain_time_difference_hours= datetime_difference.total_seconds() / 3600
         if (rain_time_difference_hours > self.LAST_HOUR_IMPACT_LOW):
             return ("🟩 LOW (PLAYABLE)")
@@ -187,8 +179,8 @@ class Rain:
         time window
         """
         string_builder=StringIO()
-        string_builder.write (f"Rain Earlier: {self.rain_status(self.filter_rain_metric(self.PRE_RAIN_WINDOW_START, self.START_TIME))}\n"
-                f"Rain Expected: {self.rain_status(self.filter_rain_metric(self.START_TIME, self.END_TIME))}\n")
+        string_builder.write (f"Rain Earlier: {self.rain_status(self.filter_rain_metric(self.pre_rain_window_start, self.start_time))}\n"
+                f"Rain Expected: {self.rain_status(self.filter_rain_metric(self.start_time, self.end_time))}\n")
         return string_builder.getvalue()
 
     def rain_status(self,time_period_forecasted):
@@ -198,7 +190,6 @@ class Rain:
         :returns: 'Yes' if rain was detected, otherwise 'No'.
         """
         return "🟥 YES" if (time_period_forecasted) else "🟩 NO"
-
 
     def weighted_rain_probability_impact(self,weighted_rain_probability):
         """
@@ -256,9 +247,9 @@ class Rain:
         :return: None
         """
         string_builder=StringIO()
-        string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK RAIN HOURS - - -\n")
+        string_builder.write(f"- - - TOP {self.top_timeline_count} PEAK RAIN HOURS - - -\n")
         sort_by_max = sorted(time_period_forecast, key=lambda item: item["rain_percentage"], reverse=True)[
-                      :self.TOP_TIMELINE_COUNT]
+                      :self.top_timeline_count]
         sort_by_time = sorted(sort_by_max, key=lambda item: item["time"])
         for each_hour in sort_by_time:
                 string_builder.write(f"\t{each_hour["time"]}: {each_hour["rain_percentage"]}% ({each_hour["rain_amount"]} mm)\n")
