@@ -5,8 +5,8 @@ class Wind:
     """
     A class that processes weather data, evaluates wind impact (both speed and gusts), and generates actionable reports
     """
-    def __init__(self,TOP_TIMELINE_COUNT, hourly_selected_forecast_data):
-        self.TOP_TIMELINE_COUNT=TOP_TIMELINE_COUNT
+    def __init__(self,top_timeline_count, hourly_selected_forecast_data):
+        self.top_timeline_count=top_timeline_count
         self.hourly_selected_forecast_data = hourly_selected_forecast_data
         self.METRIC_LIST=[]
         self.WIND_SPEED_LOW = 15
@@ -135,8 +135,8 @@ class Wind:
         :return: Formatted string showing chronological timeline entries for the specified metric
         """
         string_builder=StringIO()
-        string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK {metric.upper()} HOURS - - -\n")
-        sort_by_max = sorted(time_period_forecast, key=lambda item: item[f"{metric}"], reverse=True)[:self.TOP_TIMELINE_COUNT]
+        string_builder.write(f"- - - TOP {self.top_timeline_count} PEAK {metric.upper()} HOURS - - -\n")
+        sort_by_max = sorted(time_period_forecast, key=lambda item: item[f"{metric}"], reverse=True)[:self.top_timeline_count]
         sort_by_time = sorted(sort_by_max, key=lambda item: item["time"])
         for each_hour in sort_by_time:
             string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} kph\n")
