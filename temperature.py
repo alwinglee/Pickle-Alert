@@ -5,8 +5,8 @@ class Temperature:
     """
     A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports.
     """
-    def __init__(self,TOP_TIMELINE_COUNT,hourly_selected_forecast_data):
-        self.TOP_TIMELINE_COUNT = TOP_TIMELINE_COUNT
+    def __init__(self,top_timeline_count,hourly_selected_forecast_data):
+        self.top_timeline_count = top_timeline_count
         self.hourly_selected_forecast_data = hourly_selected_forecast_data
         self.METRIC_LIST = []
         self.FEELS_LIKE_LOW = 24
@@ -171,8 +171,8 @@ class Temperature:
         """
         string_builder = StringIO()
         display_metric_name= metric.replace("_"," ")
-        string_builder.write(f"- - - TOP {self.TOP_TIMELINE_COUNT} PEAK {display_metric_name.upper()} HOURS - - \n")
-        sort_by_max= sorted(time_period_forecast, key=lambda item:item[f"{metric}"],reverse=True)[:self.TOP_TIMELINE_COUNT]
+        string_builder.write(f"- - - TOP {self.top_timeline_count} PEAK {display_metric_name.upper()} HOURS - - \n")
+        sort_by_max= sorted(time_period_forecast, key=lambda item:item[f"{metric}"],reverse=True)[:self.top_timeline_count]
         sort_by_time = sorted(sort_by_max,key=lambda item:item["time"])
         for each_hour in sort_by_time:
             if (metric == "uv_index"):
