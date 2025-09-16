@@ -3,7 +3,7 @@ from datetime import datetime
 
 class Temperature:
     """
-    A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports.
+    A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports
     """
     FEELS_LIKE_LOW = 24
     FEELS_LIKE_MODERATE = 33
@@ -11,8 +11,6 @@ class Temperature:
     UV_INDEX_MODERATE = 5
     UV_INDEX_HIGH = 7
     UV_INDEX_VERY_HIGH = 10
-    HEAT_INDEX_LOW = 25
-    HEAT_INDEX_MODERATE = 33
     HUMIDITY_LOW = 30
     HUMIDITY_MODERATE = 60
     HUMIDITY_HIGH = 75
@@ -29,66 +27,64 @@ class Temperature:
         Each entry contains the following key-value pairs:
             - Time
             - feels like
-            - Uv Index
+            - UV Index
 
-        :return: A time-sliced list of key temperature metrics.
+        :return: A time-sliced list of key temperature metrics
         """
-        timeline = [
+        hourly_temperature = [
             {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
              "feels_like": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
              "uv_index": round(each_hour["uv"])} for each_hour in self.hourly_selected_forecast_data
         ]
-        self.METRIC_LIST = list(timeline[0].keys())[1:]
-        return timeline
+        self.METRIC_LIST = list(hourly_temperature[0].keys())[1:]
+        return hourly_temperature
 
-    def find_max_temperature_metric(self, time_period_forecast, metric):
+    def find_max_temperature_metric(self, temperature_data, metric):
         """
-        Identifies the highest temperature metric from the forecast data list.
+        Identifies the highest temperature metric from the forecast data list
 
-        :param time_period_forecast: List of rain data by time slice
+        :param temperature_data: List of rain data by time slice
         :param metric: String parameter representing the metric keyword (ex. "feels like" or "UV index")
 
-        :return: Integer value of the highest recorded value for the specified metric in the forecast data.
+        :return: Integer value of the highest recorded value for the specified metric in the forecast data
         """
-        max_raw_temperature = max(each_hour[f"{metric}"] for each_hour in time_period_forecast)
-        return max_raw_temperature
+        return max(each_hour[f"{metric}"] for each_hour in temperature_data)
 
-    def calculate_average_temperature_metric(self,time_period_forecast,metric):
+    def calculate_average_temperature_metric(self, temperature_data, metric):
         """
         Calculates the average temperature metric value from forecast data.
 
-        :param time_period_forecast: List of wind data by time interval.
+        :param temperature_data: List of wind data by time interval.
         :param metric: String representing the temperature metric to average (e.g., "feels like" or "UV index").
 
         :return: Integer value of the average for the specified temperature metric.
         """
-        total_sum = sum(each_hour[f"{metric}"] for each_hour in time_period_forecast)
-        return round(total_sum/len(time_period_forecast))
-
+        total_sum = sum(each_hour[f"{metric}"] for each_hour in temperature_data)
+        return round(total_sum/len(temperature_data))
 
     def compile_temperature_report(self):
         """
         Generates a formatted report summarizing temperature conditions
 
-        :return: A string containing the full report, structured with headers, metrics, and impact descriptions.
+        :return: A string containing the full report, structured with headers, metrics, and impact descriptions
         """
-        time_period_forecast=self.filter_temperature_metrics()
+        temperature_data = self.filter_temperature_metrics()
         string_builder = StringIO()
         for metric in self.METRIC_LIST:
             display_metric_title = metric.replace("_", " ")
-            average = self.calculate_average_temperature_metric(time_period_forecast,metric)
-            max = self.find_max_temperature_metric(time_period_forecast,metric)
-            impact = self.select_impact_method(metric,max)
+            average = self.calculate_average_temperature_metric(temperature_data, metric)
+            max_value = self.find_max_temperature_metric(temperature_data, metric)
+            impact = self.select_impact_method(metric, max_value)
 
-            string_builder.write (f"\n= = = ☀️ {display_metric_title.upper()} ☀️ = = =\n")
-            if metric=="uv_index":
-                string_builder.write(f"Max. index {max}  | Avg. index {average}\n")
-            elif metric=="humidity":
-                string_builder.write(f"Max. {max} % | Avg. {average} %\n")
+            string_builder.write(f"\n= = = ☀️ {display_metric_title.upper()} ☀️ = = =\n")
+            if (metric == "uv_index"):
+                string_builder.write(f"max_value. index {max_value}  | Avg. index {average}\n")
+            elif (metric == "humidity"):
+                string_builder.write(f"max_value. {max_value} % | Avg. {average} %\n")
             else:
-                string_builder.write(f"Max. {max} °C | Avg. {average} °C \n")
+                string_builder.write(f"max_value. {max_value} °C | Avg. {average} °C \n")
             string_builder.write(f"{impact}\n")
-            string_builder.write(self.build_temperature_timeline(time_period_forecast,metric))
+            string_builder.write(self.build_temperature_timeline(temperature_data, metric))
         return string_builder.getvalue()
 
     def temperature_summary(self):
@@ -97,22 +93,22 @@ class Temperature:
 
         :return: Formatted string with impact levels for temperature metrics
         """
-        string_builder=StringIO()
-        time_period_forecast=self.filter_temperature_metrics()
+        string_builder = StringIO()
+        temperature_data=self.filter_temperature_metrics()
         for metric in self.METRIC_LIST:
             display_metric_title = metric.replace("_", " ").title()
-            max = self.find_max_temperature_metric(time_period_forecast, metric)
-            impact = self.select_impact_method(metric,max)
+            max_value = self.find_max_temperature_metric(temperature_data, metric)
+            impact = self.select_impact_method(metric, max_value)
             string_builder.write(f"{display_metric_title}: {impact}\n")
         return string_builder.getvalue()
 
     def feels_like_impact(self, max_feels_like):
         """
-        Generates a summary of the feels like conditions for the day, including impact assessments.
+        Generates a summary of the feels like conditions for the day, including impact assessments
 
-        :param max_feels_like: An integer representing the highest feels like in the forecast data.
+        :param max_feels_like: An integer representing the highest feels like in the forecast data
 
-        :return: A string describing the day's feels like conditions, including the impact level.
+        :return: A string describing the day's feels like conditions, including the impact level
         """
         if (max_feels_like<= self.FEELS_LIKE_LOW):
             return (f"🟩 LOW (COMFORTABLE)")
@@ -121,13 +117,13 @@ class Temperature:
         else:
             return (f"🟥 HIGH (DANGEROUS HEAT)")
 
-    def uv_index_impact(self,max_uv_index):
+    def uv_index_impact(self, max_uv_index):
         """
-       Generates a summary of the UV index conditions for the day, including impact assessments.
+       Generates a summary of the UV index conditions for the day, including impact assessments
 
-       :param max_uv_index: An integer representing the highest UV index in the forecast data.
+       :param max_uv_index: An integer representing the highest UV index in the forecast data
 
-       :return: A string describing the day's uv index conditions, including the impact level.
+       :return: A string describing the day's uv index conditions, including the impact level
        """
         if (max_uv_index<= self.UV_INDEX_LOW):
             return (f"🟩 LOW (60 MIN. BURN TIME)")
@@ -142,11 +138,11 @@ class Temperature:
 
     def humidity_impact(self, max_humidity):
         """
-       Generates a summary of the humidity conditions for the day, including impact assessments.
+       Generates a summary of the humidity conditions for the day, including impact assessments
 
-       :param max_humidity: An integer representing the highest humidity in the forecast data.
+       :param max_humidity: An integer representing the highest humidity in the forecast data
 
-       :return: A string describing the day's humidity conditions, including the impact level.
+       :return: A string describing the day's humidity conditions, including the impact level
        """
         if (max_humidity <= self.HUMIDITY_LOW):
             return (f"🟩 LOW (FAST DEHYDRATION)")
@@ -157,24 +153,24 @@ class Temperature:
         else:
             return (f"🟥 EXTREME (EXHAUSTION RISK)")
 
-    def build_temperature_timeline(self,time_period_forecast, metric):
+    def build_temperature_timeline(self, temperature_data, metric):
         """
-        Generates hourly temperature forecast data formatted as a chronological timeline
+        Generates hourly temperature forecast data formatted as a chronological hourly_temperature
 
         Each entry includes:
         - Time (in `HH:MM` format)
         - feels like (°C) or UV Index (index.)
 
-        :param time_period_forecast: List of wind data points by time interval
-        :param metric: Key indicating which wind metric to display ("feels_like","heat_index", or "uv_index")
+        :param temperature_data: List of wind data points by time interval
+        :param metric: Key indicating which wind metric to display ("feels_like","Humidity", or "uv_index")
 
-        :return: Formatted string showing chronological timeline entries for the specified metric
+        :return: Formatted string showing chronological hourly_temperature entries for the specified metric
         """
         string_builder = StringIO()
-        display_metric_name= metric.replace("_"," ")
+        display_metric_name = metric.replace("_", " ")
         string_builder.write(f"- - - TOP {self.top_timeline_count} PEAK {display_metric_name.upper()} HOURS - - \n")
-        sort_by_max= sorted(time_period_forecast, key=lambda item:item[f"{metric}"],reverse=True)[:self.top_timeline_count]
-        sort_by_time = sorted(sort_by_max,key=lambda item:item["time"])
+        sort_by_max = sorted(temperature_data, key=lambda item: item[f"{metric}"],reverse=True)[:self.top_timeline_count]
+        sort_by_time = sorted(sort_by_max,key=lambda item: item["time"])
         for each_hour in sort_by_time:
             if (metric == "uv_index"):
                 string_builder.write(f"\t{each_hour["time"]}: Index {each_hour[f"{metric}"]} \n")
@@ -184,19 +180,19 @@ class Temperature:
                 string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} °C\n")
         return string_builder.getvalue()
 
-    def select_impact_method(self, metric, max):
+    def select_impact_method(self, metric, max_value):
         """
         Selects the appropriate impact method based on the given parameters.
 
         :param metric: Key indicating which temperature metric to display ("feels like", "humidity", or "uv index")
-        :param max: Maximum value (integer) found in the metric dataset
+        :param max_value: Maximum value (integer) found in the metric dataset
 
-        :return: String describing the impact level corresponding to the max value
+        :return: String describing the impact level corresponding to the max_value value
         """
         method = {"feels_like": self.feels_like_impact,
-                  "humidity":self.humidity_impact,
-                  "uv_index":self.uv_index_impact}
-        return method[metric](max)
+                  "humidity": self.humidity_impact,
+                  "uv_index": self.uv_index_impact}
+        return method[metric](max_value)
 
 
 
