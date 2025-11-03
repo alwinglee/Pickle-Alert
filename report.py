@@ -1,6 +1,3 @@
-from datetime import datetime
-import os
-from twilio.rest import Client
 class Report:
     """
     Gathers reports from other metric classes into the main Report class, preparing the data for full report generation
