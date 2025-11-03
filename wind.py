@@ -1,6 +1,7 @@
 from io import StringIO
 from datetime import datetime
 
+
 class Wind:
     """
     A class that processes weather data, evaluates wind impact (both speed and gusts), and generates actionable reports
@@ -9,10 +10,11 @@ class Wind:
     WIND_SPEED_MODERATE = 25
     WIND_GUST_LOW = 20
     WIND_GUST_MODERATE = 35
-    def __init__(self,top_timeline_count, hourly_selected_forecast_data):
-        self.top_timeline_count=top_timeline_count
+
+    def __init__(self, top_timeline_count, hourly_selected_forecast_data):
+        self.top_timeline_count = top_timeline_count
         self.hourly_selected_forecast_data = hourly_selected_forecast_data
-        self.METRIC_LIST=[]
+        self.METRIC_LIST = []
 
     def filter_wind_metrics(self):
         """
@@ -26,13 +28,14 @@ class Wind:
         :return: A time-sliced list of key wind metrics.
         """
         timeline = [
-            {"time":datetime.strptime(each_hour["time"],("%Y-%m-%d %H:%M")).strftime("%H:%M"),
-             "speed":round(each_hour["wind_kph"]), "gust":round(each_hour["gust_kph"])} for each_hour in self.hourly_selected_forecast_data
+            {"time": datetime.strptime(each_hour["time"], "%Y-%m-%d %H:%M").strftime("%H:%M"),
+             "speed": round(each_hour["wind_kph"]), "gust": round(each_hour["gust_kph"])} for each_hour
+            in self.hourly_selected_forecast_data
         ]
         self.METRIC_LIST = list(timeline[0].keys())[1:]
         return timeline
 
-    def find_max_wind_metric(self,time_period_forecast,metric):
+    def find_max_wind_metric(self, time_period_forecast, metric):
         """
         Identifies the highest wind speed or wind gust from the forecast data list.
 
@@ -41,10 +44,10 @@ class Wind:
 
         :return: Integer value of the highest recorded value for the specified metric in the forecast data.
         """
-        max_wind=max(each_hour[f"{metric}"] for each_hour in time_period_forecast)
+        max_wind = max(each_hour[f"{metric}"] for each_hour in time_period_forecast)
         return max_wind
 
-    def calculate_average_wind_metric(self,time_period_forecast,metric):
+    def calculate_average_wind_metric(self, time_period_forecast, metric):
         """
         Calculates the average wind metric value from forecast data.
 
@@ -62,18 +65,18 @@ class Wind:
 
         :return: A string containing the full report, structured with headers, metrics, and impact descriptions.
         """
-        string_builder=StringIO()
-        time_period_forecast=self.filter_wind_metrics()
+        string_builder = StringIO()
+        time_period_forecast = self.filter_wind_metrics()
         for metric in self.METRIC_LIST:
             display_metric_title = metric.replace("_", " ")
-            average = self.calculate_average_wind_metric(time_period_forecast,metric)
-            max = self.find_max_wind_metric(time_period_forecast,metric)
-            impact = self.select_impact_method(metric,max)
+            average = self.calculate_average_wind_metric(time_period_forecast, metric)
+            max_value = self.find_max_wind_metric(time_period_forecast, metric)
+            impact = self.select_impact_method(metric, max_value)
 
-            string_builder.write (f"\n= = = 🍃 WIND {display_metric_title.upper()} 🍃 = = =\n"
-                                        f"Max. {max} kph | Avg. {average} kph \n")
+            string_builder.write(f"\n= = = 🍃 WIND {display_metric_title.upper()} 🍃 = = =\n"
+                                 f"Max. {max_value} kph | Avg. {average} kph \n")
             string_builder.write(f"{impact}\n")
-            string_builder.write(self.build_wind_timeline(time_period_forecast,metric))
+            string_builder.write(self.build_wind_timeline(time_period_forecast, metric))
         return string_builder.getvalue()
 
     def wind_summary(self):
@@ -82,16 +85,16 @@ class Wind:
 
         :return: Formatted string with impact levels for all wind metrics
         """
-        string_builder=StringIO()
-        time_period_forecast=self.filter_wind_metrics()
+        string_builder = StringIO()
+        time_period_forecast = self.filter_wind_metrics()
         for metric in self.METRIC_LIST:
             display_metric_title = metric.replace("_", " ").title()
-            max = self.find_max_wind_metric(time_period_forecast, metric)
-            impact = self.select_impact_method(metric,max)
+            max_value = self.find_max_wind_metric(time_period_forecast, metric)
+            impact = self.select_impact_method(metric, max_value)
             string_builder.write(f"Wind {display_metric_title}: {impact}\n")
         return string_builder.getvalue()
 
-    def wind_speed_impact(self,max_wind_speed):
+    def wind_speed_impact(self, max_wind_speed):
         """
         Generates a summary of the wind speed conditions for the day, including impact assessments.
 
@@ -99,14 +102,14 @@ class Wind:
 
         :return: A string describing the day's wind speed conditions, including the impact level.
         """
-        if (max_wind_speed <= self.WIND_SPEED_LOW):
-            return (f"🟩 LOW (PREDICTIABLE PLAY)")
-        elif (max_wind_speed <= self.WIND_SPEED_MODERATE):
-            return (f"🟨 MODERATE (BALL SWERVE)")
+        if max_wind_speed <= self.WIND_SPEED_LOW:
+            return f"🟩 LOW (PREDICTABLE PLAY)"
+        elif max_wind_speed <= self.WIND_SPEED_MODERATE:
+            return f"🟨 MODERATE (BALL SWERVE)"
         else:
-            return (f"🟥 HIGH (ERRATIC MOVEMENT)")
+            return f"🟥 HIGH (ERRATIC MOVEMENT)"
 
-    def wind_gust_impact(self,max_wind_gust):
+    def wind_gust_impact(self, max_wind_gust):
         """
         Generates a summary of the wind gust conditions for the day, including impact assessments.
 
@@ -114,14 +117,14 @@ class Wind:
 
         :return: A string describing the day's wind gust conditions, including the impact level.
         """
-        if (max_wind_gust <= self.WIND_GUST_LOW):
-            return (f"🟩 LOW (PREDICTIABLE PLAY)")
-        elif (max_wind_gust <= self.WIND_GUST_MODERATE):
-            return (f"🟨 MODERATE (BALL SWERVE)")
+        if max_wind_gust <= self.WIND_GUST_LOW:
+            return f"🟩 LOW (PREDICTABLE PLAY)"
+        elif max_wind_gust <= self.WIND_GUST_MODERATE:
+            return f"🟨 MODERATE (BALL SWERVE)"
         else:
-            return (f"🟥 HIGH (ERRATIC MOVEMENT)")
+            return f"🟥 HIGH (ERRATIC MOVEMENT)"
 
-    def build_wind_timeline(self,time_period_forecast,metric):
+    def build_wind_timeline(self, time_period_forecast, metric):
         """
         Generates hourly wind forecast data formatted as a chronological timeline
 
@@ -134,39 +137,24 @@ class Wind:
 
         :return: Formatted string showing chronological timeline entries for the specified metric
         """
-        string_builder=StringIO()
+        string_builder = StringIO()
         string_builder.write(f"- - - TOP {self.top_timeline_count} PEAK {metric.upper()} HOURS - - -\n")
-        sort_by_max = sorted(time_period_forecast, key=lambda item: item[f"{metric}"], reverse=True)[:self.top_timeline_count]
+        sort_by_max = sorted(time_period_forecast, key=lambda item: item[f"{metric}"],
+                             reverse=True)[:self.top_timeline_count]
         sort_by_time = sorted(sort_by_max, key=lambda item: item["time"])
         for each_hour in sort_by_time:
-            string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} kph\n")
+            string_builder.write(f"\t{each_hour['time']}: {each_hour[metric]} kph\n")
         return string_builder.getvalue()
 
-    def select_impact_method(self,metric,max):
+    def select_impact_method(self, metric, max_value):
         """
-        Selects the appropriate impact method based on the given parameters.
+        Selects the appropriate impact method based on the given parameters
 
         :param metric: Key indicating which wind metric to display ("speed" or "gust")
-        :param max: Maximum value (integer) found in the metric dataset
+        :param max_value: Maximum value (integer) found in the metric dataset
 
         :return: String describing the impact level corresponding to the max value
         """
         method = {"speed": self.wind_speed_impact,
                   "gust": self.wind_gust_impact}
-        return method[metric](max)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return method[metric](max_value)
