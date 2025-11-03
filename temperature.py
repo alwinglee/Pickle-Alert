@@ -1,6 +1,7 @@
 from io import StringIO
 from datetime import datetime
 
+
 class Temperature:
     """
     A class that processes weather data, evaluates temperature, humidity, and UV index, and generates actionable reports
@@ -15,7 +16,7 @@ class Temperature:
     HUMIDITY_MODERATE = 60
     HUMIDITY_HIGH = 75
 
-    def __init__(self,top_timeline_count,hourly_selected_forecast_data):
+    def __init__(self, top_timeline_count, hourly_selected_forecast_data):
         self.top_timeline_count = top_timeline_count
         self.hourly_selected_forecast_data = hourly_selected_forecast_data
         self.METRIC_LIST = []
@@ -32,7 +33,7 @@ class Temperature:
         :return: A time-sliced list of key temperature metrics
         """
         hourly_temperature = [
-            {"time": datetime.strptime(each_hour["time"], ("%Y-%m-%d %H:%M")).strftime("%H:%M"),
+            {"time": datetime.strptime(each_hour["time"], "%Y-%m-%d %H:%M").strftime("%H:%M"),
              "feels_like": round(each_hour["feelslike_c"]), "humidity": each_hour["humidity"],
              "uv_index": round(each_hour["uv"])} for each_hour in self.hourly_selected_forecast_data
         ]
@@ -77,12 +78,12 @@ class Temperature:
             impact = self.select_impact_method(metric, max_value)
 
             string_builder.write(f"\n= = = ☀️ {display_metric_title.upper()} ☀️ = = =\n")
-            if (metric == "uv_index"):
-                string_builder.write(f"max_value. index {max_value}  | Avg. index {average}\n")
-            elif (metric == "humidity"):
-                string_builder.write(f"max_value. {max_value} % | Avg. {average} %\n")
+            if metric == "uv_index":
+                string_builder.write(f"Max. index {max_value} | Avg. index {average}\n")
+            elif metric == "humidity":
+                string_builder.write(f"Max. {max_value} % | Avg. {average} %\n")
             else:
-                string_builder.write(f"max_value. {max_value} °C | Avg. {average} °C \n")
+                string_builder.write(f"Max. {max_value} °C | Avg. {average} °C\n")
             string_builder.write(f"{impact}\n")
             string_builder.write(self.build_temperature_timeline(temperature_data, metric))
         return string_builder.getvalue()
@@ -94,7 +95,7 @@ class Temperature:
         :return: Formatted string with impact levels for temperature metrics
         """
         string_builder = StringIO()
-        temperature_data=self.filter_temperature_metrics()
+        temperature_data = self.filter_temperature_metrics()
         for metric in self.METRIC_LIST:
             display_metric_title = metric.replace("_", " ").title()
             max_value = self.find_max_temperature_metric(temperature_data, metric)
@@ -110,12 +111,12 @@ class Temperature:
 
         :return: A string describing the day's feels like conditions, including the impact level
         """
-        if (max_feels_like<= self.FEELS_LIKE_LOW):
-            return (f"🟩 LOW (COMFORTABLE)")
-        elif (max_feels_like <= self.FEELS_LIKE_MODERATE):
-            return (f"🟨 MODERATE (HEAT FATIGUE)")
+        if max_feels_like <= self.FEELS_LIKE_LOW:
+            return f"🟩 LOW (COMFORTABLE)"
+        elif max_feels_like <= self.FEELS_LIKE_MODERATE:
+            return f"🟨 MODERATE (HEAT FATIGUE)"
         else:
-            return (f"🟥 HIGH (DANGEROUS HEAT)")
+            return f"🟥 HIGH (DANGEROUS HEAT)"
 
     def uv_index_impact(self, max_uv_index):
         """
@@ -125,16 +126,16 @@ class Temperature:
 
        :return: A string describing the day's uv index conditions, including the impact level
        """
-        if (max_uv_index<= self.UV_INDEX_LOW):
-            return (f"🟩 LOW (60 MIN. BURN TIME)")
-        elif  (max_uv_index <= self.UV_INDEX_MODERATE):
-            return (f"🟨 MODERATE (45 MIN. BURN TIME)")
-        elif (max_uv_index < self.UV_INDEX_HIGH):
-            return (f"🟥 HIGH (30 MIN. BURN TIME)")
-        elif (max_uv_index < self.UV_INDEX_VERY_HIGH):
-            return (f"🟥 VERY HIGH (15 MIN. BURN TIME)")
+        if max_uv_index <= self.UV_INDEX_LOW:
+            return f"🟩 LOW (60 MIN. BURN TIME)"
+        elif max_uv_index <= self.UV_INDEX_MODERATE:
+            return f"🟨 MODERATE (45 MIN. BURN TIME)"
+        elif max_uv_index <= self.UV_INDEX_HIGH:
+            return f"🟥 HIGH (30 MIN. BURN TIME)"
+        elif max_uv_index <= self.UV_INDEX_VERY_HIGH:
+            return f"🟥 VERY HIGH (15 MIN. BURN TIME)"
         else:
-            return (f"🟥 EXTREME (STAY INDOORS)")
+            return f"🟥 EXTREME (STAY INDOORS)"
 
     def humidity_impact(self, max_humidity):
         """
@@ -144,14 +145,14 @@ class Temperature:
 
        :return: A string describing the day's humidity conditions, including the impact level
        """
-        if (max_humidity <= self.HUMIDITY_LOW):
-            return (f"🟩 LOW (FAST DEHYDRATION)")
-        elif (max_humidity <= self.HUMIDITY_MODERATE):
-            return (f"🟨 MODERATE (COMFORTABLE)")
-        elif (max_humidity< self.HUMIDITY_HIGH):
-            return (f"🟥 HIGH (AIR FEELS STICKY)")
+        if max_humidity <= self.HUMIDITY_LOW:
+            return f"🟩 LOW (FAST DEHYDRATION)"
+        elif max_humidity <= self.HUMIDITY_MODERATE:
+            return f"🟨 MODERATE (COMFORTABLE)"
+        elif max_humidity <= self.HUMIDITY_HIGH:
+            return f"🟥 HIGH (AIR FEELS STICKY)"
         else:
-            return (f"🟥 EXTREME (EXHAUSTION RISK)")
+            return f"🟥 EXTREME (EXHAUSTION RISK)"
 
     def build_temperature_timeline(self, temperature_data, metric):
         """
@@ -168,16 +169,17 @@ class Temperature:
         """
         string_builder = StringIO()
         display_metric_name = metric.replace("_", " ")
-        string_builder.write(f"- - - TOP {self.top_timeline_count} PEAK {display_metric_name.upper()} HOURS - - \n")
-        sort_by_max = sorted(temperature_data, key=lambda item: item[f"{metric}"],reverse=True)[:self.top_timeline_count]
-        sort_by_time = sorted(sort_by_max,key=lambda item: item["time"])
+        string_builder.write(f"- - - TOP {self.top_timeline_count} PEAK {display_metric_name.upper()} HOURS - - -\n")
+        sort_by_max = sorted(temperature_data, key=lambda item: item[f"{metric}"],
+                             reverse=True)[:self.top_timeline_count]
+        sort_by_time = sorted(sort_by_max, key=lambda item: item["time"])
         for each_hour in sort_by_time:
-            if (metric == "uv_index"):
-                string_builder.write(f"\t{each_hour["time"]}: Index {each_hour[f"{metric}"]} \n")
-            elif(metric=="humidity"):
-                string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} % \n")
+            if metric == "uv_index":
+                string_builder.write(f"\t{each_hour['time']}: Index {each_hour[metric]} \n")
+            elif metric == "humidity":
+                string_builder.write(f"\t{each_hour['time']}: {each_hour[metric]} % \n")
             else:
-                string_builder.write(f"\t{each_hour["time"]}: {each_hour[f"{metric}"]} °C\n")
+                string_builder.write(f"\t{each_hour['time']}: {each_hour[metric]} °C\n")
         return string_builder.getvalue()
 
     def select_impact_method(self, metric, max_value):
@@ -193,9 +195,3 @@ class Temperature:
                   "humidity": self.humidity_impact,
                   "uv_index": self.uv_index_impact}
         return method[metric](max_value)
-
-
-
-
-
-
