@@ -2,11 +2,12 @@ import requests
 import os
 from dotenv import load_dotenv
 
+
 class Weather_API:
     """
     A class to interact with a weather API and fetch forecast data
     """
-    def fetch_weather_forecast(days_to_show):
+    def fetch_weather_forecast(self, days_to_show):
         """
         Sends a request to the API server with specific parameters to retrieve the weather forecast for the current day
         and the next two days
@@ -17,7 +18,7 @@ class Weather_API:
         """
         try:
             load_dotenv()
-            weather_response = requests.get(os.getenv("URL"), params={"q": f"{os.getenv("LAT")},{os.getenv("LON")}",
+            weather_response = requests.get(os.getenv("URL"), params={"q": f"{os.getenv('LAT')},{os.getenv('LON')}",
                                                                       "key": os.getenv("API_KEY"), "days": days_to_show,
                                                                       "alerts": "yes"})
             weather_response.raise_for_status()
@@ -32,5 +33,3 @@ class Weather_API:
             raise Exception(f"MISCELLANEOUS ERROR: {error}")
         else:
             return weather_response_json
-
-
