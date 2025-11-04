@@ -1,9 +1,11 @@
 from statistics import mode
+
+
 class Condition:
     """
     A class that processes weather data, evaluates the condition and generates a report
     """
-    def __init__(self,hourly_selected_forecast_data):
+    def __init__(self, hourly_selected_forecast_data):
         self.hourly_selected_forecast_data = hourly_selected_forecast_data
 
     def filter_condition_metrics(self):
@@ -34,12 +36,3 @@ class Condition:
         :return: A formatted string representing the condition
         """
         return f"Condition: {self.find_condition_mode()}\n"
-
-
-
-
-
-
-
-
-
