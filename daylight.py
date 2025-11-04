@@ -1,12 +1,14 @@
 from datetime import datetime
+
+
 class Daylight:
     """
     Represents sunrise and sunset times for a location
     """
-    def __init__(self,forecast_data):
+    def __init__(self, forecast_data):
         self.forecast_data = forecast_data
 
-    def convert_to_military_time(self,time):
+    def convert_to_military_time(self, time):
         """
         Converts standard time from API data to military time (24-hour format) for sunrise or sunset
 
@@ -14,9 +16,9 @@ class Daylight:
 
         :return: Sunrise or sunset time in military (24-hour) format
         """
-        return datetime.strptime(time,"%I:%M %p").strftime("%H:%M")
+        return datetime.strptime(time, "%I:%M %p").strftime("%H:%M")
 
-    def retrieve_twilight_time(self,metric):
+    def retrieve_twilight_time(self, metric):
         """
         Retrieves the sunset or sunrise time
 
@@ -32,6 +34,5 @@ class Daylight:
 
         :return: A formatted string displaying sunrise and sunset times on separate lines.
         """
-        return (f"\nSunrise: {self.convert_to_military_time(self.retrieve_twilight_time("sunrise"))}\n"
-                f"Sunset: {self.convert_to_military_time(self.retrieve_twilight_time("sunset"))}")
-
+        return (f"\nSunrise: {self.convert_to_military_time(self.retrieve_twilight_time('sunrise'))}\n"
+                f"Sunset: {self.convert_to_military_time(self.retrieve_twilight_time('sunset'))}")
