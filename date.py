@@ -1,4 +1,6 @@
 from datetime import datetime
+
+
 class Date:
     """
     Represents a specific date and time for weather forecast data
@@ -14,7 +16,7 @@ class Date:
 
         :return: Formatted string representation of the forecast date
         """
-        return f"Forecast {self.forecast_data["date"]}"
+        return f"Forecast {self.forecast_data['date']}"
 
     def display_generation_date(self):
         """
@@ -22,7 +24,7 @@ class Date:
 
         :return: Formatted string with the current date and time
         """
-        return f"Generated {datetime.now().strftime("%Y-%m-%d | %H:%M%Z")}"
+        return f"Generated {datetime.now().strftime('%Y-%m-%d | %H:%M%Z')}"
 
     def display_timeframe_summary(self):
         """
@@ -30,9 +32,9 @@ class Date:
 
         :return: Formatted string showing the time range and duration
         """
-        return f"Hours: {self.start_time}- {self.end_time}"
+        return f"Hours: {self.start_time} - {self.end_time}"
 
-    def convert_to_datetime(self,time):
+    def convert_to_datetime(self, time):
         """
         Converts an integer time value (start_time or end_time) to a datetime object.
 
