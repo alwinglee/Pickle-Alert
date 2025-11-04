@@ -1,9 +1,8 @@
-from datetime import datetime
 class Location:
     """
     Represents the geographical location (city, region, country) and local time for specific coordinates
     """
-    def __init__(self,forecast_location_data):
+    def __init__(self, forecast_location_data):
         self.forecast_location_data = forecast_location_data
 
     def retrieve_location_details(self, metric):
@@ -22,8 +21,6 @@ class Location:
 
         :return: A formatted string with city, region, and country
         """
-        return (f"{self.retrieve_location_details("name")}, {self.retrieve_location_details("region")}, "
-                f"{self.retrieve_location_details("country")}")
-
-
-
+        return (f"{self.retrieve_location_details('name')}, {self.retrieve_location_details('region')}, "
+                f"{self.retrieve_location_details('country')}")
+    
