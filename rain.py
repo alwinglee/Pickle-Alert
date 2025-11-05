@@ -10,8 +10,6 @@ class Rain:
     RAIN_WEIGHTED_RAIN_PROBABILITY_MODERATE = 50
     RAIN_PRECIPITATION_LOW = 0.5
     RAIN_PRECIPITATION_MODERATE = 2.0
-    RAIN_COVERAGE_LOW = 30
-    RAIN_COVERAGE_MODERATE = 60
     LAST_HOUR_IMPACT_LOW = 3
     LAST_HOUR_IMPACT_MODERATE = 2
 
@@ -114,18 +112,15 @@ class Rain:
             return string_builder.getvalue()
         else:
             total_precipitation = self.calculate_total_precipitation(rain_data)
-            rain_coverage_percentage = self.calculate_rain_coverage_percentage(rain_data)
             weighted_rain_probability = self.calculate_weighted_rain_probability(rain_data)
             weighted_rain_probability_result = self.weighted_rain_probability_impact(weighted_rain_probability)
-            rain_coverage_result = self.rain_coverage_impact(rain_coverage_percentage)
             total_precipitation_result = self.total_precipitation_impact(total_precipitation)
             number_of_hour_of_rain = len(rain_data)
 
             string_builder.write(f"Rain {number_of_hour_of_rain}/{self.duration} hours | "
                                  f"Avg. Chance: {weighted_rain_probability}% | {total_precipitation} mm\n")
-            string_builder.write(f"Probability: {weighted_rain_probability_result}\n"
-                                 f"Coverage: {rain_coverage_result}\n"
-                                 f"Precipitation: {total_precipitation_result}")
+            string_builder.write(f"Probability {weighted_rain_probability_result}"
+                                 f"Precipitation {total_precipitation_result}")
             string_builder.write(self.build_rain_timeline(rain_data))
         return string_builder.getvalue()
 
@@ -207,21 +202,6 @@ class Rain:
         if weighted_rain_probability <= self.RAIN_WEIGHTED_RAIN_PROBABILITY_LOW:
             return "🟩 LOW (PLAYABLE)"
         elif weighted_rain_probability <= self.RAIN_WEIGHTED_RAIN_PROBABILITY_MODERATE:
-            return "🟨 MODERATE (CAUTION)\n"
-        else:
-            return "🟥 HIGH (UNPLAYABLE)\n"
-
-    def rain_coverage_impact(self, rain_coverage):
-        """
-        Classifies the percentage of total hours with rain into three impact levels
-
-        :param rain_coverage: The percentage of total hours with rain forecasted
-
-        :return: A string describing the day's rain coverage, including the impact level
-        """
-        if rain_coverage <= self.RAIN_COVERAGE_LOW:
-            return "🟩 LOW (PLAYABLE)"
-        elif rain_coverage <= self.RAIN_COVERAGE_MODERATE:
             return "🟨 MODERATE (CAUTION)\n"
         else:
             return "🟥 HIGH (UNPLAYABLE)\n"
