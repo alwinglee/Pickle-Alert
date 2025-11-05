@@ -7,7 +7,8 @@ class Weather_API:
     """
     A class to interact with a weather API and fetch forecast data
     """
-    def fetch_weather_forecast(self, days_to_show):
+    @staticmethod
+    def fetch_weather_forecast(days_to_show):
         """
         Sends a request to the API server with specific parameters to retrieve the weather forecast for the current day
         and the next two days
