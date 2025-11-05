@@ -54,7 +54,7 @@ class Alert:
 
         :returns: 'ACTIVE' and its severity if an alert is detected, otherwise 'NOT ACTIVE'
         """
-        return f"🟩 NOT ACTIVE" if not alert_data else f"🟩 ACTIVE ({alert_data['severity'].upper()})"
+        return f"🟩 NOT ACTIVE" if not alert_data else f"🟥 ACTIVE ({alert_data['severity'].upper()})"
 
     def alert_report(self):
         """
